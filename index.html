@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>朱碧航 · 3D 设计师作品集 / Zhu Bihang · 3D Design Portfolio</title>
+<meta name="description" content="朱碧航 3D 设计师作品集 — 硬表面建模 · PBR 材质 · 电商视觉 · 引擎整合">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- 可选增强字体：离线或网络受限时自动回退到系统字体，不影响版面与功能 -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@200;300;400;500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" media="all" onerror="this.remove()">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --bg:            #08090b;
+  --bg-1:          #0d0f12;
+  --bg-2:          #12151a;
+  --bg-3:          #171b21;
+  --line:          rgba(255,255,255,.075);
+  --line-2:        rgba(255,255,255,.14);
+  --fg:            #f2f4f7;
+  --fg-2:          #a8b0bd;
+  --fg-3:          #6b7482;
+  --fg-4:          #464e5a;
+
+  --acc:           #c8f542;          /* 酸性荧光绿 — 主强调 */
+  --acc-2:         #7b61ff;          /* 紫 — 次强调 */
+  --acc-3:         #ff6b4a;          /* 橙红 — 热力 */
+  --acc-4:         #35d0ba;          /* 青 */
+
+  --olive:         #6e7551;
+  --olive-2:       #4a5038;
+
+  --r-s:  6px;
+  --r-m:  12px;
+  --r-l:  20px;
+  --r-xl: 28px;
+
+  --ease: cubic-bezier(.22,1,.36,1);
+  --ease-io: cubic-bezier(.65,.05,.36,1);
+
+  --pad: clamp(20px, 5vw, 88px);
+  --maxw: 1440px;
+
+  --font-d: 'Space Grotesk', 'Noto Sans SC', 'HarmonyOS Sans SC', 'PingFang SC',
+            'Microsoft YaHei', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-b: 'Noto Sans SC', 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei',
+            'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-m: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Consolas, 'Courier New', monospace;
+}
+
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-b);
+  font-weight:300;
+  line-height:1.7;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* 全局噪点 + 网格纹理 */
+body::before{
+  content:''; position:fixed; inset:0; z-index:9998; pointer-events:none; opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+}
+
+::selection{ background:var(--acc); color:#08090b; }
+
+img{ display:block; max-width:100%; height:auto; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+#loader{
+  position:fixed; inset:0; z-index:10000; background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:26px; transition:opacity .7s var(--ease), visibility .7s;
+}
+#loader.done{ opacity:0; visibility:hidden; }
+.ld-mark{
+  font-family:var(--font-d); font-weight:700; font-size:clamp(30px,6vw,52px);
+  letter-spacing:-.03em; color:var(--fg); line-height:1;
+  display:flex; align-items:baseline; gap:14px;
+}
+.ld-mark em{ font-style:normal; color:var(--acc); }
+.ld-bar{ width:min(280px,60vw); height:1px; background:var(--line-2); position:relative; overflow:hidden; }
+.ld-bar i{ position:absolute; inset:0; background:var(--acc); transform-origin:left; transform:scaleX(0); animation:ldfill 1.5s var(--ease-io) forwards; }
+@keyframes ldfill{ to{ transform:scaleX(1); } }
+.ld-txt{ font-family:var(--font-m); font-size:10.5px; letter-spacing:.26em; color:var(--fg-3); text-transform:uppercase; }
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:900;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px var(--pad);
+  transition:padding .4s var(--ease), background .4s var(--ease), backdrop-filter .4s;
+}
+.nav.solid{
+  padding:13px var(--pad);
+  background:rgba(8,9,11,.78);
+  backdrop-filter:blur(22px) saturate(1.5);
+  -webkit-backdrop-filter:blur(22px) saturate(1.5);
+  border-bottom:1px solid var(--line);
+}
+.nav-logo{
+  font-family:var(--font-d); font-weight:700; font-size:15px; letter-spacing:-.01em;
+  display:flex; align-items:center; gap:9px;
+}
+.nav-logo .dot{
+  width:7px; height:7px; border-radius:50%; background:var(--acc);
+  box-shadow:0 0 12px var(--acc); animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.45;transform:scale(.8);} }
+
+.nav-links{ display:flex; align-items:center; gap:4px; }
+.nav-links a{
+  position:relative; padding:8px 14px; border-radius:99px;
+  font-family:var(--font-m); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--fg-3); transition:color .3s, background .3s;
+}
+.nav-links a:hover{ color:var(--fg); background:rgba(255,255,255,.045); }
+.nav-links a.on{ color:var(--acc); }
+
+.nav-cta{
+  font-family:var(--font-m); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  padding:9px 18px; border-radius:99px; border:1px solid var(--line-2);
+  transition:all .32s var(--ease); display:flex; align-items:center; gap:8px;
+}
+.nav-cta:hover{ background:var(--acc); color:#08090b; border-color:var(--acc); }
+.nav-cta svg{ width:12px; height:12px; transition:transform .32s var(--ease); }
+.nav-cta:hover svg{ transform:translate(2px,-2px); }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative; min-height:100svh; padding:0 var(--pad);
+  display:flex; flex-direction:column; justify-content:center;
+  overflow:hidden; isolation:isolate;
+}
+.hero-canvas{
+  position:absolute; inset:0; z-index:0; opacity:.5;
+}
+.hero-glow{
+  position:absolute; z-index:0; pointer-events:none;
+  width:min(1100px,120vw); height:min(1100px,120vw);
+  border-radius:50%; top:-30%; right:-28%;
+  background:radial-gradient(circle, rgba(200,245,66,.085) 0%, rgba(123,97,255,.05) 38%, transparent 66%);
+  filter:blur(30px);
+}
+.hero-glow.two{
+  top:auto; bottom:-45%; right:auto; left:-25%;
+  background:radial-gradient(circle, rgba(123,97,255,.075) 0%, transparent 62%);
+}
+
+.hero-inner{ position:relative; z-index:2; max-width:var(--maxw); width:100%; margin:0 auto; }
+
+.hero-eyebrow{
+  display:inline-flex; align-items:center; gap:11px;
+  font-family:var(--font-m); font-size:10.5px; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--fg-3); margin-bottom:26px;
+  padding:7px 16px 7px 11px; border:1px solid var(--line); border-radius:99px;
+  backdrop-filter:blur(10px); background:rgba(255,255,255,.02);
+}
+.hero-eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--acc); box-shadow:0 0 10px var(--acc); }
+
+.hero h1{
+  font-family:var(--font-d);
+  font-weight:700;
+  font-size:clamp(46px, 11.5vw, 172px);
+  line-height:.86;
+  letter-spacing:-.045em;
+  margin-bottom:8px;
+}
+.hero h1 .ln{ display:block; overflow:hidden; }
+.hero h1 .ln > span{
+  display:block; transform:translateY(105%);
+  animation:riseUp 1.1s var(--ease) forwards;
+}
+.hero h1 .ln:nth-child(1) > span{ animation-delay:.15s; }
+.hero h1 .ln:nth-child(2) > span{ animation-delay:.29s; }
+.hero h1 .ln:nth-child(3) > span{ animation-delay:.43s; }
+@keyframes riseUp{ to{ transform:translateY(0); } }
+
+.hero h1 .outline{
+  color:transparent;
+  -webkit-text-stroke:1.4px var(--fg-3);
+  text-stroke:1.4px var(--fg-3);
+}
+.hero h1 .accent{ color:var(--acc); }
+
+.hero-sub{
+  display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
+  gap:clamp(24px,5vw,72px); align-items:end;
+  margin-top:clamp(32px,5vw,58px);
+  padding-top:30px; border-top:1px solid var(--line);
+}
+.hero-lede{
+  font-size:clamp(14.5px,1.55vw,18px); line-height:1.82; color:var(--fg-2);
+  max-width:56ch; font-weight:300;
+}
+.hero-lede strong{ color:var(--fg); font-weight:500; }
+.hero-lede .hl{ color:var(--acc); font-weight:400; }
+
+.hero-tags{ display:flex; flex-wrap:wrap; gap:7px; }
+.hero-tags span{
+  font-family:var(--font-m); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  padding:6px 12px; border:1px solid var(--line); border-radius:5px; color:var(--fg-3);
+  transition:all .3s var(--ease);
+}
+.hero-tags span:hover{ border-color:var(--acc); color:var(--acc); transform:translateY(-2px); }
+
+.hero-meta{
+  position:absolute; bottom:clamp(18px,3.5vh,34px); left:var(--pad); right:var(--pad);
+  z-index:3; display:flex; align-items:center; justify-content:space-between; gap:20px;
+  font-family:var(--font-m); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--fg-4);
+}
+.scroll-hint{ display:flex; align-items:center; gap:10px; }
+.scroll-hint .track{ width:44px; height:1px; background:var(--line-2); position:relative; overflow:hidden; }
+.scroll-hint .track::after{
+  content:''; position:absolute; inset:0; background:var(--acc); transform:translateX(-100%);
+  animation:slide 2.3s var(--ease-io) infinite;
+}
+@keyframes slide{ 0%{transform:translateX(-100%);} 55%{transform:translateX(100%);} 100%{transform:translateX(100%);} }
+
+/* ============================================================
+   SECTION SHELL
+   ============================================================ */
+.sec{ position:relative; padding:clamp(78px,11vw,152px) var(--pad); }
+.sec-inner{ max-width:var(--maxw); margin:0 auto; }
+
+.sec-head{ margin-bottom:clamp(38px,5.5vw,74px); }
+.sec-head.top{ display:flex; align-items:flex-end; justify-content:space-between; gap:28px; flex-wrap:wrap; }
+
+.sec-idx{
+  font-family:var(--font-m); font-size:10.5px; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--acc); margin-bottom:16px; display:flex; align-items:center; gap:11px;
+}
+.sec-idx::before{ content:''; width:26px; height:1px; background:var(--acc); }
+
+.sec-title{
+  font-family:var(--font-d); font-weight:700;
+  font-size:clamp(30px,5.1vw,68px); line-height:1.02; letter-spacing:-.035em;
+}
+.sec-title .thin{ font-weight:300; color:var(--fg-3); }
+.sec-desc{
+  max-width:52ch; color:var(--fg-2); font-size:14.5px; line-height:1.85; margin-top:16px;
+}
+
+/* ============================================================
+   REVEAL ANIMATION
+   ============================================================ */
+[data-rv]{ opacity:0; transform:translateY(30px); transition:opacity 1s var(--ease), transform 1s var(--ease); }
+[data-rv].in{ opacity:1; transform:none; }
+[data-rv][data-d="1"]{ transition-delay:.09s; }
+[data-rv][data-d="2"]{ transition-delay:.18s; }
+[data-rv][data-d="3"]{ transition-delay:.27s; }
+[data-rv][data-d="4"]{ transition-delay:.36s; }
+[data-rv][data-d="5"]{ transition-delay:.45s; }
+
+/* ============================================================
+   PROJECT 01 — 履带车 / 硬表面
+   ============================================================ */
+.spec-bar{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+  border:1px solid var(--line); border-radius:var(--r-m); overflow:hidden;
+  margin-bottom:clamp(26px,3.6vw,44px); background:var(--bg-1);
+}
+.spec{ padding:20px 22px; border-right:1px solid var(--line); transition:background .35s; }
+.spec:last-child{ border-right:none; }
+.spec:hover{ background:rgba(255,255,255,.022); }
+.spec dt{
+  font-family:var(--font-m); font-size:9.5px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--fg-4); margin-bottom:9px;
+}
+.spec dd{ font-family:var(--font-d); font-size:17px; font-weight:500; letter-spacing:-.01em; }
+.spec dd small{ display:block; font-family:var(--font-b); font-size:11.5px; font-weight:300; color:var(--fg-3); letter-spacing:0; margin-top:3px; }
+
+/* 主视觉 */
+.hero-shot{
+  position:relative; border-radius:var(--r-l); overflow:hidden;
+  border:1px solid var(--line); background:var(--bg-2);
+  margin-bottom:clamp(14px,2vw,20px);
+  cursor:zoom-in;
+}
+.hero-shot img{ width:100%; transition:transform 1.3s var(--ease); }
+.hero-shot:hover img{ transform:scale(1.028); }
+.hero-shot::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(to top, rgba(8,9,11,.72) 0%, transparent 34%);
+}
+.hero-shot-cap{
+  position:absolute; bottom:0; left:0; right:0; z-index:3;
+  padding:clamp(18px,2.6vw,32px); display:flex; align-items:flex-end; justify-content:space-between; gap:20px;
+}
+.hero-shot-cap h3{
+  font-family:var(--font-d); font-weight:600; font-size:clamp(17px,2.3vw,27px);
+  letter-spacing:-.025em; line-height:1.2;
+}
+.hero-shot-cap p{
+  font-family:var(--font-m); font-size:10px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--acc); margin-top:8px;
+}
+.zoom-btn{
+  flex-shrink:0; width:42px; height:42px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.24); backdrop-filter:blur(10px);
+  background:rgba(255,255,255,.07); display:grid; place-items:center;
+  transition:all .34s var(--ease);
+}
+.zoom-btn svg{ width:16px; height:16px; }
+.hero-shot:hover .zoom-btn{ background:var(--acc); border-color:var(--acc); color:#08090b; transform:scale(1.08); }
+
+/* 多视图网格 */
+.mv-grid{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:clamp(10px,1.4vw,16px); margin-bottom:clamp(34px,5vw,62px);
+}
+.mv{
+  position:relative; border-radius:var(--r-m); overflow:hidden;
+  border:1px solid var(--line); background:var(--bg-2); cursor:zoom-in;
+  aspect-ratio:1/1.22;
+}
+.mv img{ width:100%; height:100%; object-fit:cover; object-position:center top;
+  transition:transform 1.1s var(--ease), filter .5s; filter:grayscale(.35) brightness(.92); }
+.mv:hover img{ transform:scale(1.06); filter:none; }
+.mv::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(to top, rgba(8,9,11,.86), transparent 48%);
+}
+.mv-cap{
+  position:absolute; bottom:0; left:0; right:0; z-index:2; padding:16px 17px;
+}
+.mv-cap b{
+  display:block; font-family:var(--font-d); font-size:12.5px; font-weight:600; letter-spacing:-.01em;
+}
+.mv-cap i{
+  font-family:var(--font-m); font-style:normal; font-size:9px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--acc); opacity:.9;
+}
+.mv-idx{
+  position:absolute; top:13px; right:14px; z-index:2;
+  font-family:var(--font-m); font-size:9.5px; letter-spacing:.12em;
+  color:var(--fg-3); padding:3px 8px; border:1px solid var(--line-2); border-radius:4px;
+  background:rgba(8,9,11,.5); backdrop-filter:blur(6px);
+  transition:all .35s var(--ease);
+}
+.mv:hover .mv-idx{ color:var(--acc); border-color:var(--acc); }
+
+/* 两栏：技术拆解 */
+.tech-split{
+  display:grid; grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
+  gap:clamp(20px,3.4vw,48px); align-items:start;
+}
+.tech-panel{
+  border:1px solid var(--line); border-radius:var(--r-l);
+  background:linear-gradient(160deg, var(--bg-1), var(--bg));
+  padding:clamp(22px,3vw,38px); position:sticky; top:88px;
+}
+.tech-panel h4{
+  font-family:var(--font-d); font-size:19px; font-weight:600; letter-spacing:-.02em;
+  margin-bottom:8px;
+}
+.tech-panel .sub{
+  font-family:var(--font-m); font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--fg-4); margin-bottom:26px;
+}
+.flow{ list-style:none; display:flex; flex-direction:column; gap:0; }
+.flow li{
+  position:relative; padding:0 0 24px 34px; border-left:1px solid var(--line);
+  margin-left:6px;
+}
+.flow li:last-child{ padding-bottom:0; border-left-color:transparent; }
+.flow li::before{
+  content:''; position:absolute; left:-4.5px; top:5px;
+  width:8px; height:8px; border-radius:50%; background:var(--bg);
+  border:1.5px solid var(--acc); transition:all .35s var(--ease);
+}
+.flow li:hover::before{ background:var(--acc); box-shadow:0 0 12px var(--acc); transform:scale(1.28); }
+.flow li b{
+  display:block; font-family:var(--font-d); font-size:13.5px; font-weight:600;
+  margin-bottom:5px; letter-spacing:-.01em;
+}
+.flow li b em{ font-style:normal; color:var(--acc); font-family:var(--font-m); font-size:10px; letter-spacing:.14em; margin-right:9px; }
+.flow li p{ font-size:12.8px; color:var(--fg-2); line-height:1.78; font-weight:300; }
+
+/* 通道展示 */
+.chan-block{ margin-bottom:clamp(30px,4.4vw,50px); }
+.chan-head{
+  display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+  margin-bottom:18px; padding-bottom:13px; border-bottom:1px solid var(--line);
+}
+.chan-head h4{ font-family:var(--font-d); font-size:16px; font-weight:600; letter-spacing:-.015em; }
+.chan-head span{ font-family:var(--font-m); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg-4); }
+.chan-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.chan{
+  position:relative; border:1px solid var(--line); border-radius:var(--r-s);
+  overflow:hidden; background:var(--bg-2); cursor:zoom-in;
+}
+.chan img{ width:100%; aspect-ratio:1; object-fit:cover; transition:transform .9s var(--ease); }
+.chan:hover img{ transform:scale(1.07); }
+.chan b{
+  position:absolute; bottom:0; left:0; right:0; padding:8px 10px;
+  font-family:var(--font-m); font-size:9.5px; font-weight:400; letter-spacing:.11em; text-transform:uppercase;
+  background:linear-gradient(to top, rgba(8,9,11,.92), transparent);
+  color:var(--fg-2); transition:color .3s;
+}
+.chan:hover b{ color:var(--acc); }
+
+/* PBR 组列表 */
+.pbr-list{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+  gap:11px; margin-top:6px;
+}
+.pbr{
+  border:1px solid var(--line); border-radius:var(--r-s); overflow:hidden;
+  background:var(--bg-2); cursor:zoom-in;
+}
+.pbr img{ width:100%; aspect-ratio:1; object-fit:cover; transition:transform .9s var(--ease); filter:brightness(.94); }
+.pbr:hover img{ transform:scale(1.08); filter:none; }
+.pbr div{ padding:9px 11px; border-top:1px solid var(--line); }
+.pbr b{ display:block; font-size:11.5px; font-weight:500; letter-spacing:-.005em; }
+.pbr i{
+  font-family:var(--font-m); font-style:normal; font-size:9px;
+  letter-spacing:.1em; color:var(--fg-4); text-transform:uppercase;
+}
+
+/* ============================================================
+   PROJECT 02 — 电商视觉
+   ============================================================ */
+.ec-grid{
+  display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(14px,2.2vw,26px);
+}
+.ec-card{
+  position:relative; border-radius:var(--r-l); overflow:hidden;
+  border:1px solid var(--line); background:var(--bg-2); cursor:zoom-in;
+}
+.ec-card img{ width:100%; aspect-ratio:1/1; object-fit:cover; transition:transform 1.2s var(--ease); }
+.ec-card:hover img{ transform:scale(1.045); }
+.ec-card::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(to top, rgba(8,9,11,.92) 0%, rgba(8,9,11,.16) 40%, transparent 66%);
+}
+.ec-body{ position:absolute; bottom:0; left:0; right:0; z-index:2; padding:clamp(20px,2.8vw,36px); }
+.ec-kicker{
+  font-family:var(--font-m); font-size:9.5px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--acc); margin-bottom:11px;
+}
+.ec-body h3{
+  font-family:var(--font-d); font-size:clamp(19px,2.5vw,30px); font-weight:600;
+  letter-spacing:-.028em; line-height:1.16; margin-bottom:11px;
+}
+.ec-body p{ font-size:13px; color:var(--fg-2); line-height:1.76; max-width:44ch; font-weight:300; }
+.ec-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; }
+.ec-tags span{
+  font-family:var(--font-m); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase;
+  padding:5px 10px; border:1px solid var(--line-2); border-radius:4px; color:var(--fg-3);
+}
+
+/* 电商能力条 */
+.ec-stats{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:var(--r-m); overflow:hidden; margin-top:clamp(26px,3.6vw,44px);
+}
+.ec-stat{ background:var(--bg-1); padding:clamp(22px,3vw,32px); transition:background .4s; }
+.ec-stat:hover{ background:var(--bg-3); }
+.ec-stat .n{
+  font-family:var(--font-d); font-size:clamp(30px,4vw,48px); font-weight:700;
+  letter-spacing:-.04em; line-height:1; color:var(--acc); margin-bottom:11px;
+}
+.ec-stat .n small{ font-size:.42em; font-weight:400; color:var(--fg-3); margin-left:4px; letter-spacing:0; }
+.ec-stat p{ font-size:12.5px; color:var(--fg-2); line-height:1.7; font-weight:300; }
+
+/* ============================================================
+   SKILLS
+   ============================================================ */
+.skill-wrap{ display:grid; grid-template-columns:repeat(auto-fit,minmax(268px,1fr)); gap:clamp(14px,2vw,22px); }
+.skill-card{
+  border:1px solid var(--line); border-radius:var(--r-l);
+  background:linear-gradient(170deg, var(--bg-1), var(--bg)); padding:clamp(22px,2.9vw,34px);
+  transition:border-color .4s var(--ease), transform .4s var(--ease), background .4s;
+  position:relative; overflow:hidden;
+}
+.skill-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--acc), transparent);
+  opacity:0; transition:opacity .45s;
+}
+.skill-card:hover{ border-color:var(--line-2); transform:translateY(-4px); background:linear-gradient(170deg, var(--bg-2), var(--bg)); }
+.skill-card:hover::before{ opacity:.85; }
+.skill-card .ic{
+  width:38px; height:38px; border-radius:9px; margin-bottom:19px;
+  display:grid; place-items:center; border:1px solid var(--line-2);
+  font-family:var(--font-m); font-size:11px; color:var(--acc); font-weight:500;
+  background:rgba(200,245,66,.05);
+}
+.skill-card h3{ font-family:var(--font-d); font-size:16.5px; font-weight:600; letter-spacing:-.02em; margin-bottom:7px; }
+.skill-card .en{ font-family:var(--font-m); font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--fg-4); margin-bottom:15px; }
+.skill-card p{ font-size:13px; color:var(--fg-2); line-height:1.8; font-weight:300; margin-bottom:18px; }
+.chips{ display:flex; flex-wrap:wrap; gap:6px; }
+.chips span{
+  font-family:var(--font-m); font-size:9.5px; letter-spacing:.08em;
+  padding:5px 10px; border-radius:4px; background:rgba(255,255,255,.038);
+  color:var(--fg-2); border:1px solid var(--line);
+  transition:all .3s var(--ease);
+}
+.chips span:hover{ background:rgba(200,245,66,.1); color:var(--acc); border-color:rgba(200,245,66,.3); }
+
+/* ============================================================
+   EXPERIENCE / TIMELINE
+   ============================================================ */
+.tl{ position:relative; padding-left:0; }
+.tl-item{
+  display:grid; grid-template-columns:minmax(0,168px) minmax(0,1fr) minmax(0,180px);
+  gap:clamp(16px,3vw,40px); padding:clamp(24px,3.2vw,38px) 0;
+  border-top:1px solid var(--line); align-items:start;
+  transition:background .4s;
+}
+.tl-item:last-child{ border-bottom:1px solid var(--line); }
+.tl-item:hover{ background:rgba(255,255,255,.014); }
+.tl-date{ font-family:var(--font-m); font-size:11.5px; letter-spacing:.09em; color:var(--acc); line-height:1.6; }
+.tl-date small{ display:block; color:var(--fg-4); font-size:10px; letter-spacing:.14em; margin-top:5px; }
+.tl-main h3{ font-family:var(--font-d); font-size:clamp(17px,2.2vw,23px); font-weight:600; letter-spacing:-.025em; margin-bottom:6px; }
+.tl-main .org{ font-size:12.5px; color:var(--fg-3); margin-bottom:14px; font-family:var(--font-m); letter-spacing:.05em; }
+.tl-main ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.tl-main li{ position:relative; padding-left:17px; font-size:13.2px; color:var(--fg-2); line-height:1.78; font-weight:300; }
+.tl-main li::before{ content:''; position:absolute; left:2px; top:9px; width:5px; height:5px; border-radius:50%; background:var(--acc); opacity:.6; }
+.tl-tags{ display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; }
+
+/* ============================================================
+   CONTACT / FOOTER
+   ============================================================ */
+.contact{
+  border-top:1px solid var(--line); padding:clamp(72px,10vw,132px) var(--pad) clamp(34px,4vw,52px);
+  position:relative; overflow:hidden;
+}
+.contact-glow{
+  position:absolute; bottom:-58%; left:50%; transform:translateX(-50%);
+  width:min(880px,118vw); height:min(880px,118vw); border-radius:50%;
+  background:radial-gradient(circle, rgba(200,245,66,.1) 0%, transparent 62%);
+  filter:blur(26px); pointer-events:none;
+}
+.contact-inner{ max-width:var(--maxw); margin:0 auto; position:relative; z-index:2; }
+.contact h2{
+  font-family:var(--font-d); font-weight:700;
+  font-size:clamp(34px,7vw,92px); line-height:1.0; letter-spacing:-.04em; margin-bottom:26px;
+}
+.contact h2 .thin{ font-weight:300; color:var(--fg-3); display:block; }
+.contact p.lede{ font-size:15px; color:var(--fg-2); max-width:50ch; line-height:1.85; margin-bottom:clamp(34px,5vw,54px); font-weight:300; }
+.contact-actions{ display:flex; flex-wrap:wrap; gap:12px; margin-bottom:clamp(50px,7vw,86px); }
+.btn{
+  display:inline-flex; align-items:center; gap:11px;
+  padding:15px 26px; border-radius:99px;
+  font-family:var(--font-m); font-size:11.5px; letter-spacing:.11em; text-transform:uppercase;
+  border:1px solid var(--line-2); transition:all .38s var(--ease);
+}
+.btn svg{ width:14px; height:14px; }
+.btn.primary{ background:var(--acc); color:#08090b; border-color:var(--acc); font-weight:500; }
+.btn.primary:hover{ transform:translateY(-3px); box-shadow:0 14px 34px rgba(200,245,66,.22); }
+.btn.ghost:hover{ border-color:var(--acc); color:var(--acc); transform:translateY(-3px); }
+
+.foot{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;
+  padding-top:clamp(24px,3vw,34px); border-top:1px solid var(--line);
+  font-family:var(--font-m); font-size:10px; letter-spacing:.17em; text-transform:uppercase; color:var(--fg-4);
+}
+.foot a:hover{ color:var(--acc); }
+
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+#lb{
+  position:fixed; inset:0; z-index:9500; background:rgba(5,6,8,.965);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  display:flex; align-items:center; justify-content:center; padding:clamp(16px,4vw,54px);
+  opacity:0; visibility:hidden; transition:opacity .42s var(--ease), visibility .42s;
+}
+#lb.on{ opacity:1; visibility:visible; }
+#lb img{
+  max-width:100%; max-height:86vh; object-fit:contain;
+  border-radius:var(--r-m); border:1px solid var(--line-2);
+  box-shadow:0 40px 110px rgba(0,0,0,.75);
+  transform:scale(.965); transition:transform .5s var(--ease);
+}
+#lb.on img{ transform:scale(1); }
+.lb-cap{
+  position:absolute; bottom:clamp(16px,3.4vw,30px); left:50%; transform:translateX(-50%);
+  font-family:var(--font-m); font-size:10.5px; letter-spacing:.17em; text-transform:uppercase;
+  color:var(--fg-2); padding:9px 18px; border:1px solid var(--line);
+  border-radius:99px; background:rgba(8,9,11,.8); backdrop-filter:blur(10px);
+  white-space:nowrap; max-width:90vw; overflow:hidden; text-overflow:ellipsis;
+}
+.lb-x{
+  position:absolute; top:clamp(16px,3.4vw,30px); right:clamp(16px,3.4vw,30px);
+  width:42px; height:42px; border-radius:50%; border:1px solid var(--line-2);
+  display:grid; place-items:center; transition:all .34s var(--ease);
+  background:rgba(255,255,255,.05);
+}
+.lb-x:hover{ background:var(--acc); color:#08090b; border-color:var(--acc); transform:rotate(90deg); }
+.lb-x svg{ width:16px; height:16px; }
+
+/* 进度条 */
+#prog{
+  position:fixed; top:0; left:0; height:2px; z-index:999;
+  background:linear-gradient(90deg,var(--acc),var(--acc-4));
+  width:0; transition:width .1s linear;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1080px){
+  .nav-links{ display:none; }
+  .hero-sub{ grid-template-columns:1fr; gap:26px; }
+  .tech-split{ grid-template-columns:1fr; }
+  .tech-panel{ position:static; }
+  .mv-grid{ grid-template-columns:repeat(2,1fr); }
+  .tl-item{ grid-template-columns:1fr; gap:14px; }
+  .tl-tags{ justify-content:flex-start; }
+}
+@media (max-width:720px){
+  .sec{ padding:clamp(58px,13vw,84px) var(--pad); }
+  .spec-bar{ grid-template-columns:repeat(2,1fr); }
+  .spec{ border-bottom:1px solid var(--line); }
+  .spec:nth-child(2n){ border-right:none; }
+  .ec-grid{ grid-template-columns:1fr; }
+  .chan-grid{ grid-template-columns:repeat(2,1fr); }
+  .pbr-list{ grid-template-columns:repeat(2,1fr); }
+  .hero-meta{ font-size:9px; letter-spacing:.14em; }
+  .hero-meta .hide-sm{ display:none; }
+  .btn{ padding:13px 20px; font-size:10.5px; }
+}
+@media (max-width:460px){
+  .mv-grid{ grid-template-columns:1fr; }
+  .mv{ aspect-ratio:4/3; }
+  .hero-tags span{ font-size:9px; padding:5px 9px; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation-duration:.01ms!important; transition-duration:.01ms!important; }
+  [data-rv]{ opacity:1; transform:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-mark">ZHU<em>/</em>BIHANG</div>
+  <div class="ld-bar"><i></i></div>
+  <div class="ld-txt">Loading Portfolio · 3D Design</div>
+</div>
+
+<div id="prog"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#top" class="nav-logo"><span class="dot"></span>Zhu Bihang</a>
+  <div class="nav-links">
+    <a href="#p1" data-nav>硬表面 / Hard Surface</a>
+    <a href="#p2" data-nav>电商视觉 / E-Commerce</a>
+    <a href="#skills" data-nav>技能栈 / Skills</a>
+    <a href="#exp" data-nav>经历 / Experience</a>
+  </div>
+  <a href="#contact" class="nav-cta">
+    联系我
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+  </a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <canvas class="hero-canvas" id="cv"></canvas>
+  <div class="hero-glow"></div>
+  <div class="hero-glow two"></div>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span class="dot"></span>3D Designer · Blender / Substance / UE5</div>
+
+    <h1>
+      <span class="ln"><span>HARD</span></span>
+      <span class="ln"><span class="outline">SURFACE</span></span>
+      <span class="ln"><span class="accent">&amp; VISUAL</span></span>
+    </h1>
+
+    <div class="hero-sub">
+      <p class="hero-lede">
+        我是 <strong>朱碧航</strong>，一名 3D 设计师。专注于
+        <span class="hl">硬表面建模</span>、<span class="hl">PBR 材质制作</span> 与
+        <span class="hl">商业视觉渲染</span> —— 从 Blender 建模、UV/UDIM 拆分、
+        Substance 3D Painter 贴图绘制，到 UE5 / Unity 引擎整合，
+        独立完成<b>建模 → 材质 → 灯光 → 渲染</b>的全流程交付。
+      </p>
+      <div class="hero-tags">
+        <span>Blender</span><span>Substance 3D Painter</span><span>UE5</span>
+        <span>Unity</span><span>Marvelous Designer</span><span>Photoshop</span><span>Premiere Pro</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-meta">
+    <span>Portfolio 2026 · Selected Works</span>
+    <span class="scroll-hint">Scroll <span class="track"></span></span>
+  </div>
+</header>
+
+<!-- ============ P1 履带车 ============ -->
+<section class="sec" id="p1">
+  <div class="sec-inner">
+
+    <div class="sec-head" data-rv>
+      <div class="sec-idx">Project 01 — Hard Surface</div>
+      <h2 class="sec-title">
+        S1 履带式防空车<br>
+        <span class="thin">高精度硬表面建模 &amp; PBR 材质全流程</span>
+      </h2>
+      <p class="sec-desc">
+        以多管防空车辆为原型的硬表面练习项目。从机械结构拆解建模起步，
+        完成 UV 拆分与 UDIM 多分块规划，再通过 Substance 3D Painter 烘焙绘制全套 PBR 贴图，
+        最终回 Blender 完成材质还原与灯光渲染。重点验证复杂机械体的结构合理性、
+        硬边/缝合边控制，以及多材质体系下的资产规范化。
+      </p>
+    </div>
+
+    <div class="spec-bar" data-rv>
+      <dl class="spec"><dt>建模工具</dt><dd>Blender<small>Hard Surface Workflow</small></dd></dl>
+      <dl class="spec"><dt>贴图工具</dt><dd>Substance 3D Painter<small>Bake + Paint</small></dd></dl>
+      <dl class="spec"><dt>贴图规格</dt><dd>4K / 2K / 1K<small>UDIM 多分块</small></dd></dl>
+      <dl class="spec"><dt>通道输出</dt><dd>6 通道 PBR<small>BaseColor / Metal / Rough / Normal / Height / AO</small></dd></dl>
+      <dl class="spec"><dt>引擎目标</dt><dd>UE5 / Unity<small>BSDF 通用贴图</small></dd></dl>
+    </div>
+
+    <!-- 主视觉 -->
+    <figure class="hero-shot" data-rv data-lb="assets/hv_hero.jpg" data-cap="三视角装配图 · Three-Quarter Assembly — S1 履带式防空车">
+      <img src="assets/hv_hero.jpg" alt="S1 履带式防空车 三视角装配渲染图" loading="lazy">
+      <figcaption class="hero-shot-cap">
+        <div>
+          <h3>三视角装配图</h3>
+          <p>Three-Quarter Assembly · Blender Render</p>
+        </div>
+        <span class="zoom-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+        </span>
+      </figcaption>
+    </figure>
+
+    <!-- 多视图 -->
+    <div class="mv-grid">
+      <figure class="mv" data-rv data-d="1" data-lb="assets/hv_side.jpg" data-cap="侧视图 · Side View — 结构比例与炮塔布局">
+        <span class="mv-idx">01</span>
+        <img src="assets/hv_side.jpg" alt="侧视图" loading="lazy">
+        <figcaption class="mv-cap"><i>Side View</i><b>侧视图</b></figcaption>
+      </figure>
+      <figure class="mv" data-rv data-d="2" data-lb="assets/hv_front.jpg" data-cap="正视图 · Front View — 12 联装发射巢对称布局">
+        <span class="mv-idx">02</span>
+        <img src="assets/hv_front.jpg" alt="正视图" loading="lazy">
+        <figcaption class="mv-cap"><i>Front View</i><b>正视图</b></figcaption>
+      </figure>
+      <figure class="mv" data-rv data-d="3" data-lb="assets/hv_top.jpg" data-cap="俯视图 · Top View — 车体装甲板与舱盖拓扑">
+        <span class="mv-idx">03</span>
+        <img src="assets/hv_top.jpg" alt="俯视图" loading="lazy">
+        <figcaption class="mv-cap"><i>Top View</i><b>俯视图</b></figcaption>
+      </figure>
+      <figure class="mv" data-rv data-d="4" data-lb="assets/hv_back.jpg" data-cap="后视图 · Rear View — 尾舱细节与挂载结构">
+        <span class="mv-idx">04</span>
+        <img src="assets/hv_back.jpg" alt="后视图" loading="lazy">
+        <figcaption class="mv-cap"><i>Rear View</i><b>后视图</b></figcaption>
+      </figure>
+    </div>
+
+    <!-- 技术拆解 -->
+    <div class="tech-split">
+      <div class="tech-panel" data-rv>
+        <h4>制作流程拆解</h4>
+        <div class="sub">Production Pipeline · 4 Stages</div>
+        <ol class="flow">
+          <li>
+            <b><em>01</em>Blender 整理 &amp; UDIM 准备</b>
+            <p>统一材质并建立 4096×4096 拼贴图像；按零件分组建立 UDIM 分块（1001 / 1002 …），
+               通过 UV 编辑器批量位移 UV 到对应分块；履带板等重复件 UV 完全重叠共用材质，
+               大幅降低贴图冗余。最终整合为单一 FBX 导出。</p>
+          </li>
+          <li>
+            <b><em>02</em>Substance 3D Painter 绘制</b>
+            <p>导入 FBX 时启用「UV 平铺工作流」，全选 Texture Set 统一烘焙使接缝自动融合；
+               跨分块连续绘制，按规范命名导出（如 <code>tank_BaseColor.&lt;UDIM&gt;.png</code>），
+               并对 4K 贴图做降分辨率与 ORM 打包瘦身。</p>
+          </li>
+          <li>
+            <b><em>03</em>Blender 贴图回接</b>
+            <p>使用 <code>Substance Textures Importer</code> 插件批量导入导出文件夹，
+               勾选 Replace Shader 与 OpenGL Normals；将图像节点来源改为「UDIM 分块」，
+               并严格区分色彩空间：BaseColor 保持 sRGB，其余通道设为非色彩。</p>
+          </li>
+          <li>
+            <b><em>04</em>性能优化与渲染</b>
+            <p>3D 视图开启「简化」将预览分辨率限制在 1024 / 2048 以保障操作流畅，
+               渲染时自动调用 4K 贴图输出高质量成图，兼顾迭代效率与成图精度。</p>
+          </li>
+        </ol>
+      </div>
+
+      <div>
+        <div class="chan-block" data-rv data-d="1">
+          <div class="chan-head">
+            <h4>PBR 通道拆解</h4>
+            <span>装甲材质 · Armor Material</span>
+          </div>
+          <div class="chan-grid">
+            <figure class="chan" data-lb="assets/chan_basecolor.jpg" data-cap="Base Color 通道 — 装甲基础色与磨损">
+              <img src="assets/chan_basecolor.jpg" alt="Base Color" loading="lazy"><b>Base Color</b></figure>
+            <figure class="chan" data-lb="assets/chan_normal.jpg" data-cap="Normal 通道 — OpenGL 法线，承载铆钉与接缝细节">
+              <img src="assets/chan_normal.jpg" alt="Normal" loading="lazy"><b>Normal</b></figure>
+            <figure class="chan" data-lb="assets/chan_roughness.jpg" data-cap="Roughness 通道 — 控制金属/涂层的粗糙度分布">
+              <img src="assets/chan_roughness.jpg" alt="Roughness" loading="lazy"><b>Roughness</b></figure>
+            <figure class="chan" data-lb="assets/chan_metallic.jpg" data-cap="Metallic 通道 — 区分涂装区与裸露金属件">
+              <img src="assets/chan_metallic.jpg" alt="Metallic" loading="lazy"><b>Metallic</b></figure>
+            <figure class="chan" data-lb="assets/chan_height.jpg" data-cap="Height 通道 — 高度图用于微表面置换">
+              <img src="assets/chan_height.jpg" alt="Height" loading="lazy"><b>Height</b></figure>
+            <figure class="chan" data-lb="assets/chan_ao.jpg" data-cap="Mixed AO 通道 — 环境光遮蔽强化结构转折">
+              <img src="assets/chan_ao.jpg" alt="Ambient Occlusion" loading="lazy"><b>Mixed AO</b></figure>
+          </div>
+        </div>
+
+        <div data-rv data-d="2">
+          <div class="chan-head">
+            <h4>分件 UV / 贴图集</h4>
+            <span>9 Texture Sets · UDIM Split</span>
+          </div>
+          <div class="pbr-list">
+            <figure class="pbr" data-lb="assets/tex_1001_1010_4k.jpg" data-cap="绿色装甲 · 4096×4096 · UDIM 1001-1010"><img src="assets/tex_1001_1010_4k.jpg" alt="装甲贴图" loading="lazy"><div><b>绿色装甲</b><i>4096² · UDIM</i></div></figure>
+            <figure class="pbr" data-lb="assets/tex_1011_1018_4k.jpg" data-cap="炮塔部分 · 4096×4096 · UDIM 1011-1018"><img src="assets/tex_1011_1018_4k.jpg" alt="炮塔贴图" loading="lazy"><div><b>炮塔部分</b><i>4096² · UDIM</i></div></figure>
+            <figure class="pbr" data-lb="assets/tex_1020_2022_4k.jpg" data-cap="12 联装发射巢 · 4096×4096 · UDIM 1020-2022"><img src="assets/tex_1020_2022_4k.jpg" alt="12联装贴图" loading="lazy"><div><b>12 联装</b><i>4096² · UDIM</i></div></figure>
+            <figure class="pbr" data-lb="assets/tex_gun_2k.jpg" data-cap="机炮 · 2048×2048"><img src="assets/tex_gun_2k.jpg" alt="机炮贴图" loading="lazy"><div><b>机炮</b><i>2048²</i></div></figure>
+            <figure class="pbr" data-lb="assets/tex_cequn_2k.jpg" data-cap="橡胶裙 · 2048×2048"><img src="assets/tex_cequn_2k.jpg" alt="橡胶裙贴图" loading="lazy"><div><b>橡胶裙</b><i>2048²</i></div></figure>
+            <figure class="pbr" data-lb="assets/tex_lun_front_1k.jpg" data-cap="负重轮 · 1024×1024"><img src="assets/tex_lun_front_1k.jpg" alt="负重轮贴图" loading="lazy"><div><b>负重轮</b><i>1024²</i></div></figure>
+            <figure class="pbr" data-lb="assets/tex_lun_zhicheng_1k.jpg" data-cap="支撑轮 · 1024×1024"><img src="assets/tex_lun_zhicheng_1k.jpg" alt="支撑轮贴图" loading="lazy"><div><b>支撑轮</b><i>1024²</i></div></figure>
+            <figure class="pbr" data-lb="assets/tex_gangsuo_1k.jpg" data-cap="钢索 · 1024×1024"><img src="assets/tex_gangsuo_1k.jpg" alt="钢索贴图" loading="lazy"><div><b>钢索</b><i>1024²</i></div></figure>
+            <figure class="pbr" data-lb="assets/tex_lvdai_1k.jpg" data-cap="履带 · 1024×1024 · 重复件 UV 重叠共用"><img src="assets/tex_lvdai_1k.jpg" alt="履带贴图" loading="lazy"><div><b>履带</b><i>1024² · 共用</i></div></figure>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ P2 电商 ============ -->
+<section class="sec" id="p2" style="background:linear-gradient(180deg, var(--bg) 0%, var(--bg-1) 50%, var(--bg) 100%);">
+  <div class="sec-inner">
+
+    <div class="sec-head top">
+      <div data-rv>
+        <div class="sec-idx">Project 02 — Commercial Visual</div>
+        <h2 class="sec-title">
+          电商产品视觉<br>
+          <span class="thin">场景搭建 · 灯光渲染 · 商业转化</span>
+        </h2>
+      </div>
+      <p class="sec-desc" data-rv data-d="1" style="margin-top:0;">
+        面向电商主图与详情页的产品渲染。以产品特性为出发点拆解卖点，
+        独立完成建模、材质、场景布置与灯光渲染 —— 用光线塑形、用环境色定调，
+        让画面在 2 秒内抓住注意力，直接服务于点击率与转化率。
+      </p>
+    </div>
+
+    <div class="ec-grid">
+      <article class="ec-card" data-rv data-lb="assets/ec_desk.jpg" data-cap="儿童学习桌椅组合 · 电商场景渲染 — 柔和童趣光效">
+        <img src="assets/ec_desk.jpg" alt="儿童学习桌椅电商渲染图" loading="lazy">
+        <div class="ec-body">
+          <div class="ec-kicker">Kids Study Set · 家居 / 儿童品类</div>
+          <h3>儿童学习桌椅组合</h3>
+          <p>针对母婴家居品类，采用低饱和粉蓝配色与拱形背景构成，
+             配合柔和漫射主光与暖色补光，营造安全、洁净、童趣的产品氛围；
+             桌面结构细节与可调节机构在光线下清晰可读，强化功能区卖点。</p>
+          <div class="ec-tags"><span>场景搭建</span><span>布光渲染</span><span>色彩构成</span><span>主图/详情页</span></div>
+        </div>
+      </article>
+
+      <article class="ec-card" data-rv data-d="1" data-lb="assets/ec_rattan.jpg" data-cap="户外藤编旋转椅 · 电商场景渲染 — 自然光写实质感">
+        <img src="assets/ec_rattan.jpg" alt="户外藤编椅电商渲染图" loading="lazy">
+        <div class="ec-body">
+          <div class="ec-kicker">Outdoor Rattan Chair · 户外家居</div>
+          <h3>户外藤编旋转椅</h3>
+          <p>写实向户外场景，重点还原藤编的编织纹理与高光的织物质感。
+             通过绿植环绕、玻璃茶几反射与自然光斑，构建真实可感的使用场景，
+             以材质可信度支撑产品溢价表达。</p>
+          <div class="ec-tags"><span>写实质感</span><span>材质表现</span><span>环境光</span><span>场景叙事</span></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="ec-stats">
+      <div class="ec-stat" data-rv><div class="n">5–8<small>张/日</small></div><p>在职期间日均稳定产出商品渲染图，兼顾质量与交付节奏</p></div>
+      <div class="ec-stat" data-rv data-d="1"><div class="n">2<small>类主题</small></div><p>覆盖儿童家居与户外家居两大品类，快速适配不同调性</p></div>
+      <div class="ec-stat" data-rv data-d="2"><div class="n">100<small>%</small></div><p>独立完成建模、材质贴图、灯光渲染全流程，无需协作等待</p></div>
+      <div class="ec-stat" data-rv data-d="3"><div class="n">4<small>套软件</small></div><p>Blender · Substance 3D Painter · Photoshop · Premiere Pro</p></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section class="sec" id="skills">
+  <div class="sec-inner">
+    <div class="sec-head" data-rv>
+      <div class="sec-idx">Capabilities</div>
+      <h2 class="sec-title">技能栈<span class="thin"> / Technical Stack</span></h2>
+      <p class="sec-desc">围绕「建模 → 材质 → 引擎 → 后期」的完整资产链路构建能力，可独立承接从概念到成片的交付。</p>
+    </div>
+
+    <div class="skill-wrap">
+      <article class="skill-card" data-rv>
+        <div class="ic">01</div>
+        <h3>硬表面建模</h3>
+        <div class="en">Hard Surface Modeling</div>
+        <p>使用 Blender 独立完成 3D 模型硬表面建模，制作合理硬边与缝合边，
+           修改 UV 并制作 UDIM 多分块，制作 LOD 以适配游戏资产标准；
+           掌握 Marvelous Designer 进行布料模型模拟创作。</p>
+        <div class="chips"><span>Blender</span><span>硬边/缝合边</span><span>UV 拆分</span><span>UDIM</span><span>LOD</span><span>Marvelous Designer</span></div>
+      </article>
+
+      <article class="skill-card" data-rv data-d="1">
+        <div class="ic">02</div>
+        <h3>材质贴图</h3>
+        <div class="en">PBR Texturing</div>
+        <p>使用 Substance 3D Painter 烘焙模型后制作 Base Color、Metallic、Roughness、
+           Normal、Height 等贴图，规范色彩空间后导出适配 Blender BSDF 或 UE 引擎的贴图资产。</p>
+        <div class="chips"><span>Substance 3D Painter</span><span>烘焙 Bake</span><span>PBR 六通道</span><span>ORM 打包</span><span>色彩空间</span></div>
+      </article>
+
+      <article class="skill-card" data-rv data-d="2">
+        <div class="ic">03</div>
+        <h3>引擎整合</h3>
+        <div class="en">Engine Integration</div>
+        <p>将完整模型导入 UE5 进行场景搭建、灯光渲染及动画展示，具备蓝图制作游戏能力；
+           也能将模型导入 Unity 或 UE5，利用引擎自动生成 LOD，为独立游戏制作提供 3D 支持。</p>
+        <div class="chips"><span>Unreal Engine 5</span><span>Unity</span><span>蓝图 Blueprint</span><span>场景灯光</span><span>自动 LOD</span></div>
+      </article>
+
+      <article class="skill-card" data-rv data-d="3">
+        <div class="ic">04</div>
+        <h3>全流程创作</h3>
+        <div class="en">Full Pipeline</div>
+        <p>独立完成从建模、材质、灯光到渲染的完整制作流程，在电商场景、
+           硬表面军事模型与户外场景搭建三类主题中系统实践，熟悉从资产到成图的每一环。</p>
+        <div class="chips"><span>建模</span><span>材质</span><span>灯光</span><span>渲染</span><span>场景搭建</span></div>
+      </article>
+
+      <article class="skill-card" data-rv data-d="4">
+        <div class="ic">05</div>
+        <h3>后期处理</h3>
+        <div class="en">Post Production</div>
+        <p>使用 Photoshop 完成图像精修、通道合成与画面调色；
+           使用 Premiere Pro 进行视频剪辑与后期输出，支撑动态展示物料制作。</p>
+        <div class="chips"><span>Photoshop</span><span>Premiere Pro</span><span>调色</span><span>合成</span><span>视频剪辑</span></div>
+      </article>
+
+      <article class="skill-card" data-rv data-d="5">
+        <div class="ic">06</div>
+        <h3>视觉设计</h3>
+        <div class="en">Visual &amp; Layout Design</div>
+        <p>具备画面构成、色彩搭配与版式排布能力，能将技术产出的模型与渲染，
+           转化为具备清晰信息层级与商业吸引力的视觉呈现，支撑主图、详情页与展示物料。</p>
+        <div class="chips"><span>构图</span><span>色彩</span><span>版式</span><span>视觉层级</span><span>品牌调性</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPERIENCE ============ -->
+<section class="sec" id="exp" style="background:var(--bg-1);">
+  <div class="sec-inner">
+    <div class="sec-head" data-rv>
+      <div class="sec-idx">Background</div>
+      <h2 class="sec-title">经历<span class="thin"> / Experience &amp; Education</span></h2>
+    </div>
+
+    <div class="tl">
+      <div class="tl-item" data-rv>
+        <div class="tl-date">2026.08 — 至今<small>ONGOING</small></div>
+        <div class="tl-main">
+          <h3>UniverseWar 独立游戏 · 3D 设计师</h3>
+          <div class="org">项目经历 · Indie Game Project</div>
+          <ul>
+            <li>基于策划需求，使用 Blender 进行硬表面建模，完成空间站舱体、外部结构等模块化场景组件的搭建与修改。</li>
+            <li>将模型导入 Unity 进行场景整合，确保太空环境的视觉真实感与游戏风格统一。</li>
+            <li>加深了对模块化场景搭建流程与硬表面建模技术的理解，提升从建模到引擎整合的全流程协作能力。</li>
+          </ul>
+        </div>
+        <div class="tl-tags"><span>Blender</span><span>Unity</span><span>模块化场景</span><span>太空环境</span></div>
+      </div>
+
+      <div class="tl-item" data-rv>
+        <div class="tl-date">2025.02 — 2025.06<small>4 MONTHS</small></div>
+        <div class="tl-main">
+          <h3>杭州君鹏瀚海网络科技有限公司 · 3D 设计师</h3>
+          <div class="org">工作经历 · Full-time</div>
+          <ul>
+            <li>负责电商宣传场景中的 3D 模型制作与场景搭建，提升产品视觉表现力。</li>
+            <li>根据产品特性与宣传需求，独立完成模型建模、材质贴图及灯光渲染。</li>
+            <li>通过场景布置与光影优化，增强画面质感与商业吸引力，支撑电商主图及详情页展示。</li>
+            <li>工作期间每日产出约 5–8 张商品渲染图，保障项目进度与交付质量。</li>
+          </ul>
+        </div>
+        <div class="tl-tags"><span>电商渲染</span><span>场景搭建</span><span>灯光</span><span>高效交付</span></div>
+      </div>
+
+      <div class="tl-item" data-rv>
+        <div class="tl-date">2021.09 — 2025.06<small>BACHELOR</small></div>
+        <div class="tl-main">
+          <h3>浙江水利水电学院 · 物联网工程</h3>
+          <div class="org">本科 · 全日制</div>
+          <ul>
+            <li>获浙江水利水电学院 2023–2024 学年三等奖学金。</li>
+            <li>工科背景培养了系统性思维与工程化意识，为复杂结构建模与引擎整合提供支撑。</li>
+          </ul>
+        </div>
+        <div class="tl-tags"><span>本科</span><span>三等奖学金</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<footer class="contact" id="contact">
+  <div class="contact-glow"></div>
+  <div class="contact-inner">
+    <div data-rv>
+      <div class="sec-idx">Get in Touch</div>
+      <h2>
+        一起做点<br>
+        <span class="thin">好看又好用的 3D。</span>
+      </h2>
+      <p class="lede">
+        目前开放 3D 设计师相关岗位机会，擅长硬表面建模、PBR 材质与商业视觉渲染。
+        欢迎随时联系沟通项目或岗位细节。
+      </p>
+    </div>
+
+    <div class="contact-actions" data-rv data-d="1">
+      <a href="mailto:xlbh65536@163.com" class="btn primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg>
+        xlbh65536@163.com
+      </a>
+      <a href="tel:15121379723" class="btn ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>
+        151 2137 9723
+      </a>
+    </div>
+
+    <div class="foot">
+      <span>© 2026 朱碧航 · 3D Designer Portfolio</span>
+      <span class="hide-sm">Blender · Substance 3D Painter · UE5 · Unity</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div id="lb">
+  <button class="lb-x" aria-label="关闭">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+  <img src="" alt="预览">
+  <div class="lb-cap"></div>
+</div>
+
+<script>
+/* ============================================================
+   1. LOADER
+   ============================================================ */
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('done'), 1250);
+});
+
+/* ============================================================
+   2. NAV / PROGRESS / SCROLLSPY
+   ============================================================ */
+const nav = document.getElementById('nav');
+const prog = document.getElementById('prog');
+const navLinks = [...document.querySelectorAll('[data-nav]')];
+const sections = ['p1','p2','skills','exp'].map(id => document.getElementById(id)).filter(Boolean);
+
+function onScroll(){
+  const y = window.scrollY;
+  nav.classList.toggle('solid', y > 60);
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  prog.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+
+  let cur = null;
+  sections.forEach(s => {
+    const r = s.getBoundingClientRect();
+    if (r.top <= window.innerHeight * 0.42) cur = s.id;
+  });
+  navLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur));
+}
+window.addEventListener('scroll', onScroll, { passive:true });
+onScroll();
+
+/* ============================================================
+   3. REVEAL ON SCROLL
+   ============================================================ */
+const io = new IntersectionObserver((es) => {
+  es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -8% 0px' });
+document.querySelectorAll('[data-rv]').forEach(el => io.observe(el));
+
+/* ============================================================
+   4. LIGHTBOX
+   ============================================================ */
+const lb = document.getElementById('lb');
+const lbImg = lb.querySelector('img');
+const lbCap = lb.querySelector('.lb-cap');
+
+document.querySelectorAll('[data-lb]').forEach(el => {
+  el.addEventListener('click', () => {
+    lbImg.src = el.getAttribute('data-lb');
+    lbCap.textContent = el.getAttribute('data-cap') || '';
+    lb.classList.add('on');
+    document.body.style.overflow = 'hidden';
+  });
+});
+function closeLb(){
+  lb.classList.remove('on');
+  document.body.style.overflow = '';
+  setTimeout(() => { lbImg.src = ''; }, 420);
+}
+lb.addEventListener('click', e => { if (e.target === lb || e.target.closest('.lb-x')) closeLb(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+
+/* ============================================================
+   5. HERO CANVAS — 点阵网格 + 连线（3D 感）
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cv');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  let W, H, pts = [], dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const mouse = { x: -9999, y: -9999 };
+
+  function resize(){
+    const r = cv.parentElement.getBoundingClientRect();
+    W = r.width; H = r.height;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    build();
+  }
+
+  function build(){
+    pts = [];
+    const gap = W < 700 ? 74 : 58;
+    const cols = Math.ceil(W / gap) + 2;
+    const rows = Math.ceil(H / gap) + 2;
+    for (let i = 0; i < cols; i++){
+      for (let j = 0; j < rows; j++){
+        pts.push({
+          x: i * gap, y: j * gap,
+          ox: i * gap, oy: j * gap,
+          vx: (Math.random() - .5) * .22,
+          vy: (Math.random() - .5) * .22,
+          z: Math.random()
+        });
+      }
+    }
+  }
+
+  function draw(t){
+    ctx.clearRect(0, 0, W, H);
+
+    // 更新
+    for (const p of pts){
+      p.x += p.vx; p.y += p.vy;
+      const dx = p.x - p.ox, dy = p.y - p.oy;
+      if (Math.abs(dx) > 14) p.vx *= -1;
+      if (Math.abs(dy) > 14) p.vy *= -1;
+
+      // 鼠标斥力
+      const mx = p.x - mouse.x, my = p.y - mouse.y;
+      const d2 = mx * mx + my * my;
+      if (d2 < 26000){
+        const d = Math.sqrt(d2) || 1;
+        p.x += (mx / d) * 1.5;
+        p.y += (my / d) * 1.5;
+      }
+      // 缓慢回归
+      p.x += (p.ox - p.x) * .014;
+      p.y += (p.oy - p.y) * .014;
+    }
+
+    // 近邻连线
+    const maxD = W < 700 ? 92 : 118;
+    for (let i = 0; i < pts.length; i++){
+      for (let j = i + 1; j < pts.length; j++){
+        const a = pts[i], b = pts[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < maxD * maxD){
+          const al = (1 - Math.sqrt(d2) / maxD) * .16;
+          ctx.strokeStyle = `rgba(200,245,66,${al})`;
+          ctx.lineWidth = .6;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+    }
+
+    // 点
+    for (const p of pts){
+      const pulse = .35 + .35 * Math.sin(t * .0011 + p.z * 8);
+      ctx.fillStyle = `rgba(168,176,189,${pulse * .5})`;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 1.15, 0, 6.283); ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  const heroEl = document.querySelector('.hero');
+  heroEl.addEventListener('pointermove', e => {
+    const r = cv.getBoundingClientRect();
+    mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+  });
+  heroEl.addEventListener('pointerleave', () => { mouse.x = mouse.y = -9999; });
+
+  let rid;
+  window.addEventListener('resize', () => { clearTimeout(rid); rid = setTimeout(resize, 200); });
+  resize();
+  requestAnimationFrame(draw);
+})();
+
+/* ============================================================
+   6. 卡片轻微视差倾斜
+   ============================================================ */
+document.querySelectorAll('.skill-card, .ec-card').forEach(card => {
+  card.addEventListener('pointermove', e => {
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - .5;
+    const py = (e.clientY - r.top) / r.height - .5;
+    card.style.transform = `translateY(-4px) rotateX(${-py * 2.2}deg) rotateY(${px * 2.2}deg)`;
+  });
+  card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+});
+</script>
+</body>
+</html>
