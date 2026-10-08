@@ -328,6 +328,9 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   display:grid; grid-template-columns:repeat(4,1fr);
   gap:clamp(10px,1.4vw,16px); margin-bottom:clamp(34px,5vw,62px);
 }
+.mv-grid.three{ grid-template-columns:repeat(3,1fr); }
+.mv-grid.three .mv{ aspect-ratio:16/9; }
+.mv-grid.three .mv img{ filter:grayscale(.22) brightness(.95); }
 .mv{
   position:relative; border-radius:var(--r-m); overflow:hidden;
   border:1px solid var(--line); background:var(--bg-2); cursor:zoom-in;
@@ -435,6 +438,10 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 }
 .flow li b em{ font-style:normal; color:var(--acc); font-family:var(--font-m); font-size:10px; letter-spacing:.14em; margin-right:9px; }
 .flow li p{ font-size:12.8px; color:var(--fg-2); line-height:1.78; font-weight:300; }
+.flow li code{
+  font-family:var(--font-m); font-size:.92em; color:var(--acc);
+  background:rgba(200,245,66,.07); padding:1px 5px; border-radius:3px;
+}
 
 /* 通道展示 */
 .chan-block{ margin-bottom:clamp(30px,4.4vw,50px); }
@@ -475,6 +482,103 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 .pbr i{
   font-family:var(--font-m); font-style:normal; font-size:9px;
   letter-spacing:.1em; color:var(--fg-4); text-transform:uppercase;
+}
+
+/* ============================================================
+   PROJECT 01 — 蒸汽朋克手枪 / 高低模烘焙对比
+   ============================================================ */
+.cmp-block{ margin-top:clamp(34px,4.6vw,62px); }
+.cmp-lede{
+  max-width:64ch; color:var(--fg-2); font-size:13.4px; line-height:1.86;
+  font-weight:300; margin:0 0 clamp(20px,2.8vw,30px);
+}
+
+/* 45° 大对比 */
+.cmp-feature{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:var(--r-l); overflow:hidden; margin-bottom:clamp(10px,1.4vw,16px);
+}
+.cmp-half{ position:relative; background:var(--bg-1); cursor:zoom-in; overflow:hidden; }
+.cmp-half img{
+  width:100%; aspect-ratio:1/1; object-fit:cover; display:block;
+  transition:transform 1.15s var(--ease);
+}
+.cmp-half:hover img{ transform:scale(1.035); }
+.cmp-tag{
+  position:absolute; top:13px; left:13px; z-index:3;
+  font-family:var(--font-m); font-size:9px; letter-spacing:.16em; text-transform:uppercase;
+  padding:5px 10px; border-radius:4px; color:var(--fg-2);
+  background:rgba(8,9,11,.78); border:1px solid var(--line-2); backdrop-filter:blur(6px);
+}
+.cmp-tag.acc{ color:var(--acc); border-color:rgba(200,245,66,.32); }
+.cmp-half figcaption{
+  position:absolute; bottom:0; left:0; right:0; padding:15px 17px;
+  background:linear-gradient(to top, rgba(8,9,11,.93), transparent);
+}
+.cmp-half figcaption i{
+  display:block; font-family:var(--font-m); font-style:normal; font-size:9px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--acc);
+}
+.cmp-half figcaption b{
+  display:block; margin-top:4px; font-family:var(--font-d); font-size:14px;
+  font-weight:600; letter-spacing:-.01em; color:var(--fg);
+}
+
+/* 其余机位小对比 */
+.cmp-grid{
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(10px,1.4vw,16px);
+}
+.cmp{
+  border:1px solid var(--line); border-radius:var(--r-m); overflow:hidden;
+  background:var(--bg-1);
+}
+.cmp-pair{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; background:var(--line); }
+.cmp-side{ position:relative; background:var(--bg-1); cursor:zoom-in; overflow:hidden; }
+.cmp-side img{ width:100%; aspect-ratio:1/1; object-fit:cover; display:block; transition:transform 1.1s var(--ease); }
+.cmp-side:hover img{ transform:scale(1.05); }
+.cmp-side span{
+  position:absolute; top:9px; left:9px; z-index:2;
+  font-family:var(--font-m); font-size:8.5px; letter-spacing:.14em; text-transform:uppercase;
+  padding:3px 7px; border-radius:3px; color:var(--fg-3);
+  background:rgba(8,9,11,.78); border:1px solid var(--line-2); backdrop-filter:blur(6px);
+}
+.cmp-side.acc span{ color:var(--acc); border-color:rgba(200,245,66,.3); }
+.cmp figcaption{
+  padding:11px 15px; border-top:1px solid var(--line);
+  display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+}
+.cmp figcaption i{
+  font-family:var(--font-m); font-style:normal; font-size:9px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--acc);
+}
+.cmp figcaption b{ font-family:var(--font-d); font-size:12.5px; font-weight:600; letter-spacing:-.01em; }
+
+/* 面数压降指标 */
+.cmp-stats{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:var(--r-m); overflow:hidden; margin-top:clamp(10px,1.4vw,16px);
+}
+.cmp-stat{ background:var(--bg-1); padding:clamp(18px,2.4vw,26px); transition:background .4s; }
+.cmp-stat:hover{ background:var(--bg-3); }
+.cmp-stat .n{
+  font-family:var(--font-d); font-size:clamp(24px,3.2vw,38px); font-weight:700;
+  letter-spacing:-.04em; line-height:1; color:var(--acc); margin-bottom:9px;
+}
+.cmp-stat .n small{ font-size:.44em; font-weight:400; color:var(--fg-3); margin-left:3px; letter-spacing:0; }
+.cmp-stat p{ font-size:12.2px; color:var(--fg-2); line-height:1.7; font-weight:300; }
+
+/* MRA 三通道拆分 */
+.mra-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px; }
+.chan-note{
+  font-family:var(--font-m); font-size:10.5px; letter-spacing:.06em; color:var(--fg-4);
+  margin-top:16px; line-height:2;
+}
+.chan-note code{
+  font-family:var(--font-m); color:var(--acc); background:rgba(200,245,66,.08);
+  padding:2px 6px; border-radius:3px; font-size:10.5px;
 }
 
 /* ============================================================
@@ -671,6 +775,7 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   .wg.four{ grid-template-columns:repeat(2,1fr); }
   .tl-item{ grid-template-columns:1fr; gap:14px; }
   .tl-tags{ justify-content:flex-start; }
+  .cmp-grid{ grid-template-columns:1fr; }
 }
 @media (max-width:720px){
   .sec{ padding:clamp(58px,13vw,84px) var(--pad); }
@@ -680,6 +785,8 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   .ec-grid{ grid-template-columns:1fr; }
   .chan-grid{ grid-template-columns:repeat(2,1fr); }
   .pbr-list{ grid-template-columns:repeat(2,1fr); }
+  .cmp-feature{ grid-template-columns:1fr; }
+  .mra-grid{ grid-template-columns:repeat(3,1fr); }
   .hero-meta{ font-size:9px; letter-spacing:.14em; }
   .hero-meta .hide-sm{ display:none; }
   .btn{ padding:13px 20px; font-size:10.5px; }
@@ -713,8 +820,9 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 <nav class="nav" id="nav">
   <a href="#top" class="nav-logo"><span class="dot"></span>Zhu Bihang</a>
   <div class="nav-links">
-    <a href="#p1" data-nav>硬表面 / Hard Surface</a>
-    <a href="#p2" data-nav>电商视觉 / E-Commerce</a>
+    <a href="#p1" data-nav>道具资产 / Game Asset</a>
+    <a href="#p2" data-nav>硬表面 / Hard Surface</a>
+    <a href="#p3" data-nav>电商视觉 / E-Commerce</a>
     <a href="#skills" data-nav>技能栈 / Skills</a>
     <a href="#exp" data-nav>经历 / Experience</a>
   </div>
@@ -731,7 +839,7 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   <div class="hero-glow two"></div>
 
   <div class="hero-inner">
-    <div class="hero-eyebrow"><span class="dot"></span>3D Designer · Blender / Substance / UE5</div>
+    <div class="hero-eyebrow"><span class="dot"></span>3D Designer · Blender / Substance / 3ds Max / UE5</div>
 
     <h1>
       <span class="ln"><span>HARD</span></span>
@@ -744,11 +852,11 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
         我是 <strong>朱碧航</strong>，一名 3D 设计师。专注于
         <span class="hl">硬表面建模</span>、<span class="hl">PBR 材质制作</span> 与
         <span class="hl">商业视觉渲染</span> —— 从 Blender 建模、UV/UDIM 拆分、
-        Substance 3D Painter 贴图绘制，到 UE5 / Unity 引擎整合，
+        Substance 3D Painter 烘焙绘制，到 3ds Max 材质灯光重建与 UE5 / Unity 引擎整合，
         独立完成<b>建模 → 材质 → 灯光 → 渲染</b>的全流程交付。
       </p>
       <div class="hero-tags">
-        <span>Blender</span><span>Substance 3D Painter</span><span>UE5</span>
+        <span>Blender</span><span>Substance 3D Painter</span><span>3ds Max</span><span>UE5</span>
         <span>Unity</span><span>Marvelous Designer</span><span>Photoshop</span><span>Premiere Pro</span>
       </div>
     </div>
@@ -760,15 +868,222 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   </div>
 </header>
 
-<!-- ============ P1 履带车 ============ -->
+<!-- ============ P1 蒸汽朋克手枪 ============ -->
 <section class="sec" id="p1">
   <div class="sec-inner">
 
     <div class="sec-head" data-rv>
-      <div class="sec-idx">Project 01 — Hard Surface</div>
+      <div class="sec-idx">Project 01 — Game Asset · PBR Pipeline</div>
+      <h2 class="sec-title">
+        蒸汽朋克手枪道具<br>
+        <span class="thin">高低模烘焙 &amp; 游戏道具资产工作流</span>
+      </h2>
+      <p class="sec-desc">
+        以蒸汽朋克风格老式手枪为原型的游戏道具资产。在 Blender 中同步制作高模与低模，
+        按材质类型划分为 11 个 Texture Set；于 Substance 3D Painter 完成高低模几何烘焙与材质绘制，
+        在单张 1024² 贴图集的预算内输出固有色、法线与 MRA 三通道打包贴图；
+        低模经 FBX 导入 3ds Max 后重建 PBR 材质、灯光与渲染环境，
+        最终完成高模与低模的同机位对比与多视角展示。
+      </p>
+    </div>
+
+    <div class="spec-bar" data-rv>
+      <dl class="spec"><dt>高模面数</dt><dd>35,259<small>Tris · Blender 细分形态</small></dd></dl>
+      <dl class="spec"><dt>低模面数</dt><dd>4,389<small>Tris · 保留 12.5%</small></dd></dl>
+      <dl class="spec"><dt>贴图集</dt><dd>1024²<small>单张 · 11 Texture Sets</small></dd></dl>
+      <dl class="spec"><dt>通道输出</dt><dd>D / N / MRA<small>三通道打包输出</small></dd></dl>
+      <dl class="spec"><dt>渲染</dt><dd>3ds Max<small>PBR 材质与灯光重建</small></dd></dl>
+    </div>
+
+    <!-- 主视觉 -->
+    <figure class="hero-shot" data-rv data-lb="assets/gun_max_45.jpg" data-cap="成品渲染 · 45° 视角 — 3ds Max 内重建 PBR 材质与灯光后的最终成图">
+      <img src="assets/gun_max_45.jpg" alt="蒸汽朋克手枪 45 度成品渲染图" loading="lazy">
+      <figcaption class="hero-shot-cap">
+        <div>
+          <h3>成品渲染 · 45°</h3>
+          <p>Final Render · 3ds Max · PBR Relight</p>
+        </div>
+        <span class="zoom-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+        </span>
+      </figcaption>
+    </figure>
+
+    <!-- 多视图 -->
+    <div class="mv-grid three">
+      <figure class="mv" data-rv data-d="1" data-lb="assets/gun_max_side.jpg" data-cap="侧视图 · Side View — 枪管、转轮与击锤机构的比例关系">
+        <span class="mv-idx">01</span>
+        <img src="assets/gun_max_side.jpg" alt="手枪侧视图" loading="lazy">
+        <figcaption class="mv-cap"><i>Side View</i><b>侧视图</b></figcaption>
+      </figure>
+      <figure class="mv" data-rv data-d="2" data-lb="assets/gun_max_front.jpg" data-cap="正视图 · Front View — 枪口与准星的对称结构">
+        <span class="mv-idx">02</span>
+        <img src="assets/gun_max_front.jpg" alt="手枪正视图" loading="lazy">
+        <figcaption class="mv-cap"><i>Front View</i><b>正视图</b></figcaption>
+      </figure>
+      <figure class="mv" data-rv data-d="3" data-lb="assets/gun_max_back.jpg" data-cap="后视图 · Rear View — 握把雕花与击锤尾部结构">
+        <span class="mv-idx">03</span>
+        <img src="assets/gun_max_back.jpg" alt="手枪后视图" loading="lazy">
+        <figcaption class="mv-cap"><i>Rear View</i><b>后视图</b></figcaption>
+      </figure>
+    </div>
+
+    <!-- 高低模烘焙验证 -->
+    <div class="cmp-block">
+      <div class="chan-head" data-rv>
+        <h4>高低模烘焙验证</h4>
+        <span>35,259 → 4,389 Tris · Same Camera · 4 Views</span>
+      </div>
+      <p class="cmp-lede" data-rv>
+        四个机位采用完全一致的相机与光照：左为高模素模，右为应用法线烘焙后的低模成品。
+        面数压缩至原来的 12.5%，轮廓转折、倒角高光与结构细节全部由 Normal 贴图承载还原。
+      </p>
+
+      <!-- 45° 大对比 -->
+      <div class="cmp-feature" data-rv>
+        <figure class="cmp-half" data-lb="assets/gun_high_45.jpg" data-cap="高模 · 45° 视角 — 35,259 Tris 素模，倒角与雕花细节完整">
+          <span class="cmp-tag">High Poly · 35,259 Tris</span>
+          <img src="assets/gun_high_45.jpg" alt="高模 45 度素模渲染" loading="lazy">
+          <figcaption><i>高模素模 · Clay</i><b>35,259 Tris</b></figcaption>
+        </figure>
+        <figure class="cmp-half" data-lb="assets/gun_low_45.jpg" data-cap="低模 · 45° 视角 — 4,389 Tris，细节由法线烘焙还原">
+          <span class="cmp-tag acc">Low Poly · 4,389 Tris</span>
+          <img src="assets/gun_low_45.jpg" alt="低模 45 度烘焙成品" loading="lazy">
+          <figcaption><i>低模烘焙 · Baked</i><b>4,389 Tris</b></figcaption>
+        </figure>
+      </div>
+
+      <!-- 其余三机位 -->
+      <div class="cmp-grid">
+        <figure class="cmp" data-rv data-d="1">
+          <div class="cmp-pair">
+            <div class="cmp-side" data-lb="assets/gun_high_side.jpg" data-cap="高模侧视 — 35,259 Tris 素模">
+              <span>High</span>
+              <img src="assets/gun_high_side.jpg" alt="高模侧视" loading="lazy">
+            </div>
+            <div class="cmp-side acc" data-lb="assets/gun_low_side.jpg" data-cap="低模侧视 — 4,389 Tris，法线还原倒角与螺丝细节">
+              <span>Low</span>
+              <img src="assets/gun_low_side.jpg" alt="低模侧视" loading="lazy">
+            </div>
+          </div>
+          <figcaption><i>Side View</i><b>侧视</b></figcaption>
+        </figure>
+        <figure class="cmp" data-rv data-d="2">
+          <div class="cmp-pair">
+            <div class="cmp-side" data-lb="assets/gun_high_front.jpg" data-cap="高模正视 — 35,259 Tris 素模">
+              <span>High</span>
+              <img src="assets/gun_high_front.jpg" alt="高模正视" loading="lazy">
+            </div>
+            <div class="cmp-side acc" data-lb="assets/gun_low_front.jpg" data-cap="低模正视 — 4,389 Tris，枪口与准星轮廓一致">
+              <span>Low</span>
+              <img src="assets/gun_low_front.jpg" alt="低模正视" loading="lazy">
+            </div>
+          </div>
+          <figcaption><i>Front View</i><b>正视</b></figcaption>
+        </figure>
+        <figure class="cmp" data-rv data-d="3">
+          <div class="cmp-pair">
+            <div class="cmp-side" data-lb="assets/gun_high_back.jpg" data-cap="高模后视 — 35,259 Tris 素模">
+              <span>High</span>
+              <img src="assets/gun_high_back.jpg" alt="高模后视" loading="lazy">
+            </div>
+            <div class="cmp-side acc" data-lb="assets/gun_low_back.jpg" data-cap="低模后视 — 4,389 Tris，握把雕花由法线承载">
+              <span>Low</span>
+              <img src="assets/gun_low_back.jpg" alt="低模后视" loading="lazy">
+            </div>
+          </div>
+          <figcaption><i>Rear View</i><b>后视</b></figcaption>
+        </figure>
+      </div>
+
+      <div class="cmp-stats" data-rv>
+        <div class="cmp-stat"><div class="n">12.5<small>%</small></div><p>面数保留率 —— 35,259 Tris 压至 4,389 Tris</p></div>
+        <div class="cmp-stat"><div class="n">87.5<small>%</small></div><p>冗余面削减，细节改由 Normal 贴图承载</p></div>
+        <div class="cmp-stat"><div class="n">4<small>机位</small></div><p>45° / 侧 / 正 / 背 四视角同机位对比验证</p></div>
+        <div class="cmp-stat"><div class="n">3<small>张贴图</small></div><p>1024² 单贴图集覆盖 11 个 Texture Set</p></div>
+      </div>
+    </div>
+
+    <!-- 技术拆解 -->
+    <div class="tech-split">
+      <div class="tech-panel" data-rv>
+        <h4>制作流程拆解</h4>
+        <div class="sub">Production Pipeline · 4 Stages</div>
+        <ol class="flow">
+          <li>
+            <b><em>01</em>Blender 高低模制作</b>
+            <p>同步搭建高模与低模：高模承载倒角、雕花与螺丝等完整细节形态，
+               低模按游戏道具标准精简布线，保留轮廓转折与硬边。
+               全模型按材质类型划分为 <code>11 个 Texture Set</code>，
+               统一低模 UV，确保各分区在单张贴图集内排布合理且互不重叠。</p>
+          </li>
+          <li>
+            <b><em>02</em>Substance 3D Painter 烘焙与绘制</b>
+            <p>以高模为源对低模做几何烘焙，得到法线、AO 与曲率等贴图；
+               在此基础上按 11 个材质分区分别绘制做旧钢件、黄铜、木材等质感，
+               最终导出固有色、法线与 MRA 三张贴图。</p>
+          </li>
+          <li>
+            <b><em>03</em>低模拓扑整理与 FBX 导出</b>
+            <p>烘焙后复核低模布线，修正扭曲、黑边与平滑组问题，
+               确认硬边正确后导出 FBX —— 保证跨软件传递时法线与 UV 不失真。</p>
+          </li>
+          <li>
+            <b><em>04</em>3ds Max 材质灯光重建与渲染</b>
+            <p>低模经 FBX 导入 3ds Max，按 PBR 规范重建材质球并正确接入
+               D / N / MRA 贴图（含色彩空间与法线空间设置），
+               搭建灯光与渲染环境，输出高低模多视角对比与成品展示。</p>
+          </li>
+        </ol>
+      </div>
+      <div>
+        <div class="chan-block" data-rv data-d="1">
+          <div class="chan-head">
+            <h4>贴图集与通道打包</h4>
+            <span>1024² · 3 Maps · ORM Packed</span>
+          </div>
+          <div class="chan-grid">
+            <figure class="chan" data-lb="assets/gun_tex_D.jpg" data-cap="固有色 Base Color — 木材、黄铜与做旧钢件的色彩与磨损分布">
+              <img src="assets/gun_tex_D.jpg" alt="Base Color" loading="lazy"><b>Base Color</b></figure>
+            <figure class="chan" data-lb="assets/gun_tex_N.jpg" data-cap="法线 Normal — 按 Maya 法线约定输出，承载高模全部结构细节">
+              <img src="assets/gun_tex_N.jpg" alt="Normal" loading="lazy"><b>Normal</b></figure>
+            <figure class="chan" data-lb="assets/gun_tex_MRA.jpg" data-cap="MRA 打包 — R 金属度 / G 粗糙度 / B 环境光遮蔽 合于一图">
+              <img src="assets/gun_tex_MRA.jpg" alt="MRA" loading="lazy"><b>MRA Packed</b></figure>
+          </div>
+
+          <div class="chan-head" style="margin-top:clamp(20px,2.6vw,32px)">
+            <h4>MRA 三通道拆分</h4>
+            <span>R · Metallic　G · Roughness　B · AO</span>
+          </div>
+          <div class="mra-grid">
+            <figure class="chan" data-lb="assets/gun_mra_metal.jpg" data-cap="R 通道 · 金属度 Metallic — 区分黄铜、钢件与木材">
+              <img src="assets/gun_mra_metal.jpg" alt="Metallic" loading="lazy"><b>R · Metallic</b></figure>
+            <figure class="chan" data-lb="assets/gun_mra_rough.jpg" data-cap="G 通道 · 粗糙度 Roughness — 磨损区与抛光区的分布">
+              <img src="assets/gun_mra_rough.jpg" alt="Roughness" loading="lazy"><b>G · Roughness</b></figure>
+            <figure class="chan" data-lb="assets/gun_mra_ao.jpg" data-cap="B 通道 · 环境光遮蔽 AO — 转折与缝隙的遮蔽强度">
+              <img src="assets/gun_mra_ao.jpg" alt="AO" loading="lazy"><b>B · AO</b></figure>
+          </div>
+          <p class="chan-note">
+            单张 <code>MRA</code> 把金属度、粗糙度与环境光遮蔽打包进 RGB 三个通道，
+            是 UE / Unity 的通用贴图规范（ORM 打包）——
+            三张 1024² 贴图即可承载整套道具资产，符合游戏项目的显存与采样预算。
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ P2 履带车 ============ -->
+<section class="sec" id="p2">
+  <div class="sec-inner">
+
+    <div class="sec-head" data-rv>
+      <div class="sec-idx">Project 02 — Hard Surface · UDIM</div>
       <h2 class="sec-title">
         S1 履带式防空车<br>
-        <span class="thin">高精度硬表面建模 &amp; PBR 材质全流程</span>
+        <span class="thin">复杂机械体建模 &amp; UDIM 多分块管理</span>
       </h2>
       <p class="sec-desc">
         以多管防空车辆为原型的硬表面练习项目。从机械结构拆解建模起步，
@@ -878,23 +1193,6 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
           </div>
         </div>
 
-        <div data-rv data-d="2">
-          <div class="chan-head">
-            <h4>分件 UV / 贴图集</h4>
-            <span>9 Texture Sets · UDIM Split</span>
-          </div>
-          <div class="pbr-list">
-            <figure class="pbr" data-lb="assets/tex_1001_1010_4k.jpg" data-cap="绿色装甲 · 4096×4096 · UDIM 1001-1010"><img src="assets/tex_1001_1010_4k.jpg" alt="装甲贴图" loading="lazy"><div><b>绿色装甲</b><i>4096² · UDIM</i></div></figure>
-            <figure class="pbr" data-lb="assets/tex_1011_1018_4k.jpg" data-cap="炮塔部分 · 4096×4096 · UDIM 1011-1018"><img src="assets/tex_1011_1018_4k.jpg" alt="炮塔贴图" loading="lazy"><div><b>炮塔部分</b><i>4096² · UDIM</i></div></figure>
-            <figure class="pbr" data-lb="assets/tex_1020_2022_4k.jpg" data-cap="12 联装发射巢 · 4096×4096 · UDIM 1020-2022"><img src="assets/tex_1020_2022_4k.jpg" alt="12联装贴图" loading="lazy"><div><b>12 联装</b><i>4096² · UDIM</i></div></figure>
-            <figure class="pbr" data-lb="assets/tex_gun_2k.jpg" data-cap="机炮 · 2048×2048"><img src="assets/tex_gun_2k.jpg" alt="机炮贴图" loading="lazy"><div><b>机炮</b><i>2048²</i></div></figure>
-            <figure class="pbr" data-lb="assets/tex_cequn_2k.jpg" data-cap="橡胶裙 · 2048×2048"><img src="assets/tex_cequn_2k.jpg" alt="橡胶裙贴图" loading="lazy"><div><b>橡胶裙</b><i>2048²</i></div></figure>
-            <figure class="pbr" data-lb="assets/tex_lun_front_1k.jpg" data-cap="负重轮 · 1024×1024"><img src="assets/tex_lun_front_1k.jpg" alt="负重轮贴图" loading="lazy"><div><b>负重轮</b><i>1024²</i></div></figure>
-            <figure class="pbr" data-lb="assets/tex_lun_zhicheng_1k.jpg" data-cap="支撑轮 · 1024×1024"><img src="assets/tex_lun_zhicheng_1k.jpg" alt="支撑轮贴图" loading="lazy"><div><b>支撑轮</b><i>1024²</i></div></figure>
-            <figure class="pbr" data-lb="assets/tex_gangsuo_1k.jpg" data-cap="钢索 · 1024×1024"><img src="assets/tex_gangsuo_1k.jpg" alt="钢索贴图" loading="lazy"><div><b>钢索</b><i>1024²</i></div></figure>
-            <figure class="pbr" data-lb="assets/tex_lvdai_1k.jpg" data-cap="履带 · 1024×1024 · 重复件 UV 重叠共用"><img src="assets/tex_lvdai_1k.jpg" alt="履带贴图" loading="lazy"><div><b>履带</b><i>1024² · 共用</i></div></figure>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -962,13 +1260,13 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   </div>
 </section>
 
-<!-- ============ P2 电商 ============ -->
-<section class="sec" id="p2" style="background:linear-gradient(180deg, var(--bg) 0%, var(--bg-1) 50%, var(--bg) 100%);">
+<!-- ============ P3 电商 ============ -->
+<section class="sec" id="p3" style="background:linear-gradient(180deg, var(--bg) 0%, var(--bg-1) 50%, var(--bg) 100%);">
   <div class="sec-inner">
 
     <div class="sec-head top">
       <div data-rv>
-        <div class="sec-idx">Project 02 — Commercial Visual</div>
+        <div class="sec-idx">Project 03 — Commercial Visual</div>
         <h2 class="sec-title">
           电商产品视觉<br>
           <span class="thin">场景搭建 · 灯光渲染 · 商业转化</span>
@@ -1041,9 +1339,10 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
         <div class="ic">02</div>
         <h3>材质贴图</h3>
         <div class="en">PBR Texturing</div>
-        <p>使用 Substance 3D Painter 烘焙模型后制作 Base Color、Metallic、Roughness、
-           Normal、Height 等贴图，规范色彩空间后导出适配 Blender BSDF 或 UE 引擎的贴图资产。</p>
-        <div class="chips"><span>Substance 3D Painter</span><span>烘焙 Bake</span><span>PBR 六通道</span><span>ORM 打包</span><span>色彩空间</span></div>
+        <p>使用 Substance 3D Painter 完成高低模几何烘焙后制作 Base Color、Metallic、Roughness、
+           Normal 等贴图，按 ORM / MRA 规范打包通道，规范色彩空间后导出适配
+           Blender、3ds Max 或 UE 引擎的贴图资产。</p>
+        <div class="chips"><span>Substance 3D Painter</span><span>高低模烘焙</span><span>MRA 打包</span><span>色彩空间</span></div>
       </article>
 
       <article class="skill-card" data-rv data-d="2">
@@ -1060,8 +1359,9 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
         <h3>全流程创作</h3>
         <div class="en">Full Pipeline</div>
         <p>独立完成从建模、材质、灯光到渲染的完整制作流程，在电商场景、
-           硬表面军事模型与户外场景搭建三类主题中系统实践，熟悉从资产到成图的每一环。</p>
-        <div class="chips"><span>建模</span><span>材质</span><span>灯光</span><span>渲染</span><span>场景搭建</span></div>
+           硬表面军事模型与户外场景搭建三类主题中系统实践，熟悉从资产到成图的每一环；
+           并能通过 FBX 在 Blender 与 3ds Max 之间传递资产并重建 PBR 材质与灯光。</p>
+        <div class="chips"><span>建模</span><span>材质</span><span>灯光</span><span>渲染</span><span>3ds Max</span><span>FBX 资产传递</span></div>
       </article>
 
       <article class="skill-card" data-rv data-d="4">
