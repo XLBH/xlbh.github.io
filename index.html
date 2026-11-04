@@ -334,6 +334,11 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 .mv-grid.two{ grid-template-columns:repeat(2,1fr); }
 .mv-grid.two .mv{ aspect-ratio:3/2; }
 .mv-grid.two .mv img{ filter:grayscale(.12) brightness(.97); }
+/* 履带车：渲染图共用 #3b3b3b 底板，contain 保证正/俯视不被裁切，留白与底板同色看不出来 */
+.mv-grid.hv3{ grid-template-columns:repeat(3,1fr); }
+.mv-grid.hv3 .mv{ aspect-ratio:1/1; background:#3b3b3b; }
+.mv-grid.hv3 .mv img{ object-fit:contain; object-position:center; filter:none; }
+.mv-grid.hv3 .mv::after{ background:linear-gradient(to top, rgba(8,9,11,.62), transparent 28%); }
 .mv{
   position:relative; border-radius:var(--r-m); overflow:hidden;
   border:1px solid var(--line); background:var(--bg-2); cursor:zoom-in;
@@ -889,7 +894,8 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
         以 Glock 19 Gen5 为原型的写实道具资产。在 Blender 中完成硬表面建模与拓扑整理，
         统一 UV 并做紧凑排布 —— <b>2,610 顶点 / 2,369 面 / 4,764 三角面 / 20 个部件</b>；
         导入 Substance 3D Painter 烘焙法线与遮蔽，绘制钢制滑套的磨损划痕、聚合物握把的哑光颗粒与刻字细节，
-        最终输出 Base Color、Normal 与 ORM 三张 4096² 贴图，回接 Blender 完成灯光与渲染。
+        最终输出 Base Color、Normal 与 ORM 三张 4096² 贴图，回接 Blender 完成灯光与渲染，
+        并导入 UE5 验证实时管线下的材质接入与比例表现。
       </p>
     </div>
 
@@ -971,6 +977,23 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
       </p>
     </div>
 
+    <!-- UE5 实机验证 -->
+    <div class="chan-block" style="margin-top:clamp(30px,4vw,50px)">
+      <div class="chan-head" data-rv>
+        <h4>UE5 实机验证</h4>
+        <span>Real-time · Unreal Engine 5</span>
+      </div>
+      <figure class="wf wide" data-rv data-lb="assets/glock_ue5.jpg" data-cap="UE5 引擎内实机截图 —— 资产导入后在实时渲染管线下的材质接入、比例与法线表现">
+        <img src="assets/glock_ue5.jpg" alt="格洛克 19 在 UE5 中的实机渲染效果" loading="lazy">
+        <figcaption><i>In-Engine Capture</i><b>UE5 实机效果</b></figcaption>
+      </figure>
+      <p class="chan-note">
+        资产导入 UE5 后直接于引擎内截图：Base Color 保持 sRGB、Normal 与 ORM 走线性，
+        ORM 按 R 遮蔽 / G 粗糙 / B 金属分别接入材质节点；同时确认实时管线下的轮廓比例、
+        法线响应与离线渲染一致，可继续用于引擎内的后续场景整合。
+      </p>
+    </div>
+
   </div>
 </section>
 
@@ -985,8 +1008,9 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
         <span class="thin">高低模烘焙 &amp; 游戏道具资产工作流</span>
       </h2>
       <p class="sec-desc">
-        以蒸汽朋克风格老式手枪为原型的游戏道具资产。在 Blender 中同步制作高模与低模，
-        按材质类型划分为 11 个 Texture Set；于 Substance 3D Painter 完成高低模几何烘焙与材质绘制，
+        以蒸汽朋克风格老式手枪为原型的游戏道具资产。先在 Blender 中搭建低模，确定整枪比例、
+        结构与游戏可用布线，再在其基础上细化出高模；按材质类型划分为 11 个 Texture Set，
+        于 Substance 3D Painter 完成高低模几何烘焙与材质绘制，
         在单张 1024² 贴图集的预算内输出固有色、法线与 MRA 三通道打包贴图；
         低模经 FBX 导入 3ds Max 后重建 PBR 材质、灯光与渲染环境，
         最终完成高模与低模的同机位对比与多视角展示。
@@ -994,8 +1018,8 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
     </div>
 
     <div class="spec-bar" data-rv>
-      <dl class="spec"><dt>高模面数</dt><dd>35,259<small>Tris · Blender 细分形态</small></dd></dl>
-      <dl class="spec"><dt>低模面数</dt><dd>4,389<small>Tris · 保留 12.5%</small></dd></dl>
+      <dl class="spec"><dt>高模面数</dt><dd>35,259<small>Tris · 细节形态 / 烘焙源</small></dd></dl>
+      <dl class="spec"><dt>低模面数</dt><dd>4,389<small>Tris · 游戏可用布线</small></dd></dl>
       <dl class="spec"><dt>贴图集</dt><dd>1024²<small>单张 · 11 Texture Sets</small></dd></dl>
       <dl class="spec"><dt>通道输出</dt><dd>D / N / MRA<small>三通道打包输出</small></dd></dl>
       <dl class="spec"><dt>渲染</dt><dd>3ds Max<small>PBR 材质与灯光重建</small></dd></dl>
@@ -1038,11 +1062,12 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
     <div class="cmp-block">
       <div class="chan-head" data-rv>
         <h4>高低模烘焙验证</h4>
-        <span>35,259 → 4,389 Tris · Same Camera · 4 Views</span>
+        <span>Low 4,389 / High 35,259 Tris · Same Camera · 4 Views</span>
       </div>
       <p class="cmp-lede" data-rv>
         四个机位采用完全一致的相机与光照：左为高模素模，右为应用法线烘焙后的低模成品。
-        面数压缩至原来的 12.5%，轮廓转折、倒角高光与结构细节全部由 Normal 贴图承载还原。
+        低模先行定形与布线，高模由同一模型细化而来、仅作烘焙源 ——
+        最终进引擎的是保留轮廓转折与硬边的低模，倒角高光与雕花细节由 Normal 贴图承载。
       </p>
 
       <!-- 45° 大对比 -->
@@ -1103,10 +1128,10 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
       </div>
 
       <div class="cmp-stats" data-rv>
-        <div class="cmp-stat"><div class="n">12.5<small>%</small></div><p>面数保留率 —— 35,259 Tris 压至 4,389 Tris</p></div>
-        <div class="cmp-stat"><div class="n">87.5<small>%</small></div><p>冗余面削减，细节改由 Normal 贴图承载</p></div>
+        <div class="cmp-stat"><div class="n">2<small>套模型</small></div><p>低模定形布线 + 高模细化细节，同一套 UV 对齐</p></div>
         <div class="cmp-stat"><div class="n">4<small>机位</small></div><p>45° / 侧 / 正 / 背 四视角同机位对比验证</p></div>
-        <div class="cmp-stat"><div class="n">3<small>张贴图</small></div><p>1024² 单贴图集覆盖 11 个 Texture Set</p></div>
+        <div class="cmp-stat"><div class="n">3<small>张贴图</small></div><p>D / N / MRA 三通道打包，1024² 单张贴图集</p></div>
+        <div class="cmp-stat"><div class="n">11<small>分区</small></div><p>按材质划分 Texture Set，钢件 / 黄铜 / 木柄独立绘制</p></div>
       </div>
     </div>
 
@@ -1116,9 +1141,9 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
       <div class="sub">Production Pipeline · 4 Stages</div>
       <ol class="flow">
         <li>
-          <b><em>01</em>Blender 高低模制作</b>
-          <p>同步搭建高模与低模：高模承载倒角、雕花与螺丝等完整细节形态，
-             低模按游戏道具标准精简布线，保留轮廓转折与硬边。
+          <b><em>01</em>Blender 低模定形 · 高模细化</b>
+          <p>先搭建低模，确定整枪的比例、结构与游戏可用布线，保留轮廓转折与硬边；
+             再以同一模型为基础细化出高模，补齐倒角、雕花、螺丝与铆钉等细节形态。
              全模型按材质类型划分为 <code>11 个 Texture Set</code>，
              统一低模 UV，确保各分区在单张贴图集内排布合理且互不重叠。</p>
         </li>
@@ -1129,7 +1154,7 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
              最终导出固有色、法线与 MRA 三张贴图。</p>
         </li>
         <li>
-          <b><em>03</em>低模拓扑整理与 FBX 导出</b>
+          <b><em>03</em>低模复核与 FBX 导出</b>
           <p>烘焙后复核低模布线，修正扭曲、黑边与平滑组问题，
              确认硬边正确后导出 FBX —— 保证跨软件传递时法线与 UV 不失真。</p>
         </li>
@@ -1164,7 +1189,7 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
     </div>
 
     <div class="spec-bar" data-rv>
-      <dl class="spec"><dt>建模工具</dt><dd>Blender<small>Hard Surface Workflow</small></dd></dl>
+      <dl class="spec"><dt>建模工具</dt><dd>Blender<small>247,758 Tris · 31 部件</small></dd></dl>
       <dl class="spec"><dt>贴图工具</dt><dd>Substance 3D Painter<small>Bake + Paint</small></dd></dl>
       <dl class="spec"><dt>贴图规格</dt><dd>4K / 2K / 1K<small>UDIM 多分块</small></dd></dl>
       <dl class="spec"><dt>通道输出</dt><dd>6 通道 PBR<small>BaseColor / Metal / Rough / Normal / Height / AO</small></dd></dl>
@@ -1172,12 +1197,12 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
     </div>
 
     <!-- 主视觉 -->
-    <figure class="hero-shot" data-rv data-lb="assets/hv_hero.jpg" data-cap="三视角装配图 · Three-Quarter Assembly — S1 履带式防空车">
-      <img src="assets/hv_hero.jpg" alt="S1 履带式防空车 三视角装配渲染图" loading="lazy">
+    <figure class="hero-shot" data-rv data-lb="assets/hv_hero.jpg" data-cap="整车渲染 · Hero Render — S1 履带式防空车 3/4 视角">
+      <img src="assets/hv_hero.jpg" alt="S1 履带式防空车 3/4 视角渲染图" loading="lazy">
       <figcaption class="hero-shot-cap">
         <div>
-          <h3>三视角装配图</h3>
-          <p>Three-Quarter Assembly · Blender Render</p>
+          <h3>整车渲染 · 3/4 主视角</h3>
+          <p>Hero Render · Blender Cycles</p>
         </div>
         <span class="zoom-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
@@ -1186,26 +1211,21 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
     </figure>
 
     <!-- 多视图 -->
-    <div class="mv-grid">
-      <figure class="mv" data-rv data-d="1" data-lb="assets/hv_side.jpg" data-cap="侧视图 · Side View — 结构比例与炮塔布局">
+    <div class="mv-grid hv3">
+      <figure class="mv" data-rv data-d="1" data-lb="assets/hv_side.jpg" data-cap="侧视图 · Side View — 车体比例与七对负重轮 / 诱导轮布局">
         <span class="mv-idx">01</span>
         <img src="assets/hv_side.jpg" alt="侧视图" loading="lazy">
         <figcaption class="mv-cap"><i>Side View</i><b>侧视图</b></figcaption>
       </figure>
-      <figure class="mv" data-rv data-d="2" data-lb="assets/hv_front.jpg" data-cap="正视图 · Front View — 12 联装发射巢对称布局">
+      <figure class="mv" data-rv data-d="2" data-lb="assets/hv_front.jpg" data-cap="正视图 · Front View — 12 联装发射巢与双联机炮左右对称">
         <span class="mv-idx">02</span>
         <img src="assets/hv_front.jpg" alt="正视图" loading="lazy">
         <figcaption class="mv-cap"><i>Front View</i><b>正视图</b></figcaption>
       </figure>
-      <figure class="mv" data-rv data-d="3" data-lb="assets/hv_top.jpg" data-cap="俯视图 · Top View — 车体装甲板与舱盖拓扑">
+      <figure class="mv" data-rv data-d="3" data-lb="assets/hv_top.jpg" data-cap="俯视图 · Top View — 车体装甲板、舱盖与雷达基座拓扑">
         <span class="mv-idx">03</span>
         <img src="assets/hv_top.jpg" alt="俯视图" loading="lazy">
         <figcaption class="mv-cap"><i>Top View</i><b>俯视图</b></figcaption>
-      </figure>
-      <figure class="mv" data-rv data-d="4" data-lb="assets/hv_back.jpg" data-cap="后视图 · Rear View — 尾舱细节与挂载结构">
-        <span class="mv-idx">04</span>
-        <img src="assets/hv_back.jpg" alt="后视图" loading="lazy">
-        <figcaption class="mv-cap"><i>Rear View</i><b>后视图</b></figcaption>
       </figure>
     </div>
 
@@ -1266,49 +1286,10 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
       </div>
     </div>
 
-    <!-- 线框 / 拓扑 / UV 验证 -->
+    <!-- UV 布局 / UDIM 验证 -->
     <div class="verify">
 
-      <div class="chan-head" data-rv>
-        <h4>线框与拓扑验证</h4>
-        <span>Wireframe · 247,758 Tris · 31 Parts</span>
-      </div>
-      <div class="wg">
-        <figure class="wf" data-rv data-d="1" data-lb="assets/wire_hero.png" data-cap="整车线框 · 3/4 视角 —— 全局布线走向与面数密度分布">
-          <span class="wf-tag">Full Vehicle</span>
-          <img src="assets/wire_hero.png" alt="整车线框 3/4 视角" loading="lazy">
-          <figcaption><i>3/4 View · Wireframe</i><b>整车线框</b></figcaption>
-        </figure>
-        <figure class="wf" data-rv data-d="2" data-lb="assets/wire_side.png" data-cap="整车线框 · 侧视 —— 结构比例与轮廓布线">
-          <span class="wf-tag">Full Vehicle</span>
-          <img src="assets/wire_side.png" alt="整车线框 侧视" loading="lazy">
-          <figcaption><i>Side View · Wireframe</i><b>侧视线框</b></figcaption>
-        </figure>
-      </div>
-      <div class="wg">
-        <figure class="wf" data-rv data-d="1" data-lb="assets/wire_run_gear.png" data-cap="行走机构特写 —— 负重轮辐条放射状布线与履带板铰接结构">
-          <span class="wf-tag">Detail</span>
-          <img src="assets/wire_run_gear.png" alt="行走机构线框特写" loading="lazy">
-          <figcaption><i>Running Gear</i><b>行走机构</b></figcaption>
-        </figure>
-        <figure class="wf" data-rv data-d="2" data-lb="assets/wire_front.png" data-cap="车首特写 —— 首上装甲倾斜面与拖钩座布线">
-          <span class="wf-tag">Detail</span>
-          <img src="assets/wire_front.png" alt="车首线框特写" loading="lazy">
-          <figcaption><i>Front Hull</i><b>车首细节</b></figcaption>
-        </figure>
-        <figure class="wf" data-rv data-d="3" data-lb="assets/wire_drive_wheel.png" data-cap="传动轮总成 —— 轮盘同心圆拓扑与齿圈分段">
-          <span class="wf-tag">Detail</span>
-          <img src="assets/wire_drive_wheel.png" alt="传动轮线框" loading="lazy">
-          <figcaption><i>Drive Sprocket</i><b>传动轮总成</b></figcaption>
-        </figure>
-        <figure class="wf" data-rv data-d="4" data-lb="assets/wire_weapon.png" data-cap="武器系统 —— 12 联装发射巢筒身与雷达座布线">
-          <span class="wf-tag">Detail</span>
-          <img src="assets/wire_weapon.png" alt="武器系统线框" loading="lazy">
-          <figcaption><i>Weapon System</i><b>武器系统</b></figcaption>
-        </figure>
-      </div>
-
-      <div class="chan-head" data-rv style="margin-top:clamp(26px,3.4vw,44px)">
+      <div class="chan-head" data-rv style="margin-top:0">
         <h4>UV 布局 · UDIM 1001 – 1010</h4>
         <span>171,087 UV Edges · 10 Tiles · 31 Parts</span>
       </div>
