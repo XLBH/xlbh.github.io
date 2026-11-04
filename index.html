@@ -125,9 +125,9 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 }
 @keyframes pulse{ 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.45;transform:scale(.8);} }
 
-.nav-links{ display:flex; align-items:center; gap:4px; }
+.nav-links{ display:flex; align-items:center; gap:1px; }
 .nav-links a{
-  position:relative; padding:8px 14px; border-radius:99px;
+  position:relative; padding:8px 11px; border-radius:99px;
   font-family:var(--font-m); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
   color:var(--fg-3); transition:color .3s, background .3s;
 }
@@ -331,6 +331,9 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 .mv-grid.three{ grid-template-columns:repeat(3,1fr); }
 .mv-grid.three .mv{ aspect-ratio:16/9; }
 .mv-grid.three .mv img{ filter:grayscale(.22) brightness(.95); }
+.mv-grid.two{ grid-template-columns:repeat(2,1fr); }
+.mv-grid.two .mv{ aspect-ratio:3/2; }
+.mv-grid.two .mv img{ filter:grayscale(.12) brightness(.97); }
 .mv{
   position:relative; border-radius:var(--r-m); overflow:hidden;
   border:1px solid var(--line); background:var(--bg-2); cursor:zoom-in;
@@ -411,6 +414,9 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   border:1px solid var(--line); border-radius:var(--r-l);
   background:linear-gradient(160deg, var(--bg-1), var(--bg));
   padding:clamp(22px,3vw,38px); position:sticky; top:88px;
+}
+.tech-panel.solo{
+  position:static; max-width:900px; margin:clamp(30px,4vw,52px) auto 0;
 }
 .tech-panel h4{
   font-family:var(--font-d); font-size:19px; font-weight:600; letter-spacing:-.02em;
@@ -820,9 +826,10 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 <nav class="nav" id="nav">
   <a href="#top" class="nav-logo"><span class="dot"></span>Zhu Bihang</a>
   <div class="nav-links">
-    <a href="#p1" data-nav>道具资产 / Game Asset</a>
-    <a href="#p2" data-nav>硬表面 / Hard Surface</a>
-    <a href="#p3" data-nav>电商视觉 / E-Commerce</a>
+    <a href="#p1" data-nav>格洛克 / Glock</a>
+    <a href="#p2" data-nav>蒸汽手枪 / Prop</a>
+    <a href="#p3" data-nav>履带车 / Vehicle</a>
+    <a href="#p4" data-nav>电商 / Shop</a>
     <a href="#skills" data-nav>技能栈 / Skills</a>
     <a href="#exp" data-nav>经历 / Experience</a>
   </div>
@@ -850,7 +857,7 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
     <div class="hero-sub">
       <p class="hero-lede">
         我是 <strong>朱碧航</strong>，一名 3D 设计师。专注于
-        <span class="hl">硬表面建模</span>、<span class="hl">PBR 材质制作</span> 与
+        <span class="hl">写实道具与硬表面建模</span>、<span class="hl">PBR 材质制作</span> 与
         <span class="hl">商业视觉渲染</span> —— 从 Blender 建模、UV/UDIM 拆分、
         Substance 3D Painter 烘焙绘制，到 3ds Max 材质灯光重建与 UE5 / Unity 引擎整合，
         独立完成<b>建模 → 材质 → 灯光 → 渲染</b>的全流程交付。
@@ -868,12 +875,111 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   </div>
 </header>
 
-<!-- ============ P1 蒸汽朋克手枪 ============ -->
+<!-- ============ P1 格洛克 19 ============ -->
 <section class="sec" id="p1">
   <div class="sec-inner">
 
     <div class="sec-head" data-rv>
-      <div class="sec-idx">Project 01 — Game Asset · PBR Pipeline</div>
+      <div class="sec-idx">Project 01 — Realistic Prop · PBR</div>
+      <h2 class="sec-title">
+        格洛克 19 手枪<br>
+        <span class="thin">写实道具建模 &amp; 4K PBR 材质全流程</span>
+      </h2>
+      <p class="sec-desc">
+        以 Glock 19 Gen5 为原型的写实道具资产。在 Blender 中完成硬表面建模与拓扑整理，
+        统一 UV 并做紧凑排布 —— <b>2,610 顶点 / 2,369 面 / 4,764 三角面 / 20 个部件</b>；
+        导入 Substance 3D Painter 烘焙法线与遮蔽，绘制钢制滑套的磨损划痕、聚合物握把的哑光颗粒与刻字细节，
+        最终输出 Base Color、Normal 与 ORM 三张 4096² 贴图，回接 Blender 完成灯光与渲染。
+      </p>
+    </div>
+
+    <div class="spec-bar" data-rv>
+      <dl class="spec"><dt>低模面数</dt><dd>4,764<small>Tris · 2,610 顶点 / 2,369 面</small></dd></dl>
+      <dl class="spec"><dt>部件数</dt><dd>20<small>独立 Object</small></dd></dl>
+      <dl class="spec"><dt>贴图规格</dt><dd>4096²<small>单套 UV · 3 张</small></dd></dl>
+      <dl class="spec"><dt>通道输出</dt><dd>Base / Normal / ORM<small>R 遮蔽 · G 粗糙 · B 金属</small></dd></dl>
+      <dl class="spec"><dt>参考原型</dt><dd>Glock 19 Gen5<small>Real-world Reference</small></dd></dl>
+    </div>
+
+    <!-- 主视觉 -->
+    <figure class="hero-shot" data-rv data-lb="assets/glock_hero.jpg" data-cap="双枪俯视 · 成品渲染 — 钢制滑套与聚合物握把的材质对比">
+      <img src="assets/glock_hero.jpg" alt="格洛克 19 双枪俯视成品渲染图" loading="lazy">
+      <figcaption class="hero-shot-cap">
+        <div>
+          <h3>双枪俯视 · 成品渲染</h3>
+          <p>Twin Top View · Blender Render</p>
+        </div>
+        <span class="zoom-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+        </span>
+      </figcaption>
+    </figure>
+
+    <!-- 双侧视图 -->
+    <div class="mv-grid two">
+      <figure class="mv" data-rv data-d="1" data-lb="assets/glock_side_a.jpg" data-cap="侧视 · Side View — 滑套刻字 AUSTRIA 9x19、防滑纹与扳机保险细节">
+        <span class="mv-idx">01</span>
+        <img src="assets/glock_side_a.jpg" alt="格洛克 19 侧视图" loading="lazy">
+        <figcaption class="mv-cap"><i>Side View</i><b>侧视图 · 右向</b></figcaption>
+      </figure>
+      <figure class="mv" data-rv data-d="2" data-lb="assets/glock_side_b.jpg" data-cap="另一侧 · 抛壳口、枪身编号与握把防滑颗粒细节">
+        <span class="mv-idx">02</span>
+        <img src="assets/glock_side_b.jpg" alt="格洛克 19 另一侧视图" loading="lazy">
+        <figcaption class="mv-cap"><i>Opposite Side</i><b>侧视图 · 左向</b></figcaption>
+      </figure>
+    </div>
+
+    <!-- 线框与 UV -->
+    <div class="chan-block" style="margin-top:clamp(30px,4vw,50px)">
+      <div class="chan-head" data-rv>
+        <h4>线框与 UV 展开</h4>
+        <span>2,610 Verts · 4,764 Tris · 20 Objects</span>
+      </div>
+      <figure class="wf wide" data-rv data-lb="assets/glock_wire.jpg" data-cap="Blender 工作视图 — 左侧为 UV 分块排布，右侧为线框拓扑：2,610 顶点 / 4,764 三角面 / 20 个部件">
+        <img src="assets/glock_wire.jpg" alt="格洛克 19 线框与 UV 展开" loading="lazy">
+        <figcaption><i>Wireframe &amp; UV Layout</i><b>线框与 UV 分块</b></figcaption>
+      </figure>
+    </div>
+
+    <!-- UV 与材质 / 贴图集 -->
+    <div class="chan-block">
+      <div class="chan-head" data-rv>
+        <h4>UV 与材质对应</h4>
+        <span>4096² Single UV Set</span>
+      </div>
+      <figure class="wf wide" data-rv data-lb="assets/glock_uv.jpg" data-cap="左侧为成品侧视渲染，右侧为同一套 UV 上色后的分块排布 —— 单套 4096² 贴图承载全部 20 个部件">
+        <img src="assets/glock_uv.jpg" alt="格洛克 19 UV 与材质对应" loading="lazy">
+        <figcaption><i>UV ↔ Material</i><b>UV 与材质对应</b></figcaption>
+      </figure>
+
+      <div class="chan-head" style="margin-top:clamp(26px,3.4vw,40px)">
+        <h4>贴图集 · 三张 4096²</h4>
+        <span>Base Color · Normal · ORM</span>
+      </div>
+      <div class="chan-grid">
+        <figure class="chan" data-lb="assets/glock_tex_D.jpg" data-cap="Base Color — 钢制滑套的做旧磨损与聚合物握把的哑光黑">
+          <img src="assets/glock_tex_D.jpg" alt="Base Color 贴图" loading="lazy"><b>Base Color</b></figure>
+        <figure class="chan" data-lb="assets/glock_tex_N.jpg" data-cap="Normal — 防滑纹、刻字与倒角细节由法线承载">
+          <img src="assets/glock_tex_N.jpg" alt="Normal 贴图" loading="lazy"><b>Normal</b></figure>
+        <figure class="chan" data-lb="assets/glock_tex_ORM.jpg" data-cap="ORM 打包 — R 环境光遮蔽 / G 粗糙度 / B 金属度">
+          <img src="assets/glock_tex_ORM.jpg" alt="ORM 贴图" loading="lazy"><b>ORM Packed</b></figure>
+      </div>
+      <p class="chan-note">
+        单张 <code>ORM</code> 把环境光遮蔽、粗糙度与金属度打包进 R / G / B：R 承载缝隙遮蔽、
+        G 控制滑套与握把的粗糙度差异、B 以二值区分金属与聚合物 ——
+        一套 4096² 贴图覆盖全部 20 个部件，符合 UE / Unity 的贴图采样与显存预算。
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ P2 蒸汽朋克手枪 ============ -->
+<section class="sec" id="p2">
+  <div class="sec-inner">
+
+    <div class="sec-head" data-rv>
+      <div class="sec-idx">Project 02 — Game Asset · High/Low Bake</div>
       <h2 class="sec-title">
         蒸汽朋克手枪道具<br>
         <span class="thin">高低模烘焙 &amp; 游戏道具资产工作流</span>
@@ -1005,82 +1111,46 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
     </div>
 
     <!-- 技术拆解 -->
-    <div class="tech-split">
-      <div class="tech-panel" data-rv>
-        <h4>制作流程拆解</h4>
-        <div class="sub">Production Pipeline · 4 Stages</div>
-        <ol class="flow">
-          <li>
-            <b><em>01</em>Blender 高低模制作</b>
-            <p>同步搭建高模与低模：高模承载倒角、雕花与螺丝等完整细节形态，
-               低模按游戏道具标准精简布线，保留轮廓转折与硬边。
-               全模型按材质类型划分为 <code>11 个 Texture Set</code>，
-               统一低模 UV，确保各分区在单张贴图集内排布合理且互不重叠。</p>
-          </li>
-          <li>
-            <b><em>02</em>Substance 3D Painter 烘焙与绘制</b>
-            <p>以高模为源对低模做几何烘焙，得到法线、AO 与曲率等贴图；
-               在此基础上按 11 个材质分区分别绘制做旧钢件、黄铜、木材等质感，
-               最终导出固有色、法线与 MRA 三张贴图。</p>
-          </li>
-          <li>
-            <b><em>03</em>低模拓扑整理与 FBX 导出</b>
-            <p>烘焙后复核低模布线，修正扭曲、黑边与平滑组问题，
-               确认硬边正确后导出 FBX —— 保证跨软件传递时法线与 UV 不失真。</p>
-          </li>
-          <li>
-            <b><em>04</em>3ds Max 材质灯光重建与渲染</b>
-            <p>低模经 FBX 导入 3ds Max，按 PBR 规范重建材质球并正确接入
-               D / N / MRA 贴图（含色彩空间与法线空间设置），
-               搭建灯光与渲染环境，输出高低模多视角对比与成品展示。</p>
-          </li>
-        </ol>
-      </div>
-      <div>
-        <div class="chan-block" data-rv data-d="1">
-          <div class="chan-head">
-            <h4>贴图集与通道打包</h4>
-            <span>1024² · 3 Maps · ORM Packed</span>
-          </div>
-          <div class="chan-grid">
-            <figure class="chan" data-lb="assets/gun_tex_D.jpg" data-cap="固有色 Base Color — 木材、黄铜与做旧钢件的色彩与磨损分布">
-              <img src="assets/gun_tex_D.jpg" alt="Base Color" loading="lazy"><b>Base Color</b></figure>
-            <figure class="chan" data-lb="assets/gun_tex_N.jpg" data-cap="法线 Normal — 按 Maya 法线约定输出，承载高模全部结构细节">
-              <img src="assets/gun_tex_N.jpg" alt="Normal" loading="lazy"><b>Normal</b></figure>
-            <figure class="chan" data-lb="assets/gun_tex_MRA.jpg" data-cap="MRA 打包 — R 金属度 / G 粗糙度 / B 环境光遮蔽 合于一图">
-              <img src="assets/gun_tex_MRA.jpg" alt="MRA" loading="lazy"><b>MRA Packed</b></figure>
-          </div>
-
-          <div class="chan-head" style="margin-top:clamp(20px,2.6vw,32px)">
-            <h4>MRA 三通道拆分</h4>
-            <span>R · Metallic　G · Roughness　B · AO</span>
-          </div>
-          <div class="mra-grid">
-            <figure class="chan" data-lb="assets/gun_mra_metal.jpg" data-cap="R 通道 · 金属度 Metallic — 区分黄铜、钢件与木材">
-              <img src="assets/gun_mra_metal.jpg" alt="Metallic" loading="lazy"><b>R · Metallic</b></figure>
-            <figure class="chan" data-lb="assets/gun_mra_rough.jpg" data-cap="G 通道 · 粗糙度 Roughness — 磨损区与抛光区的分布">
-              <img src="assets/gun_mra_rough.jpg" alt="Roughness" loading="lazy"><b>G · Roughness</b></figure>
-            <figure class="chan" data-lb="assets/gun_mra_ao.jpg" data-cap="B 通道 · 环境光遮蔽 AO — 转折与缝隙的遮蔽强度">
-              <img src="assets/gun_mra_ao.jpg" alt="AO" loading="lazy"><b>B · AO</b></figure>
-          </div>
-          <p class="chan-note">
-            单张 <code>MRA</code> 把金属度、粗糙度与环境光遮蔽打包进 RGB 三个通道，
-            是 UE / Unity 的通用贴图规范（ORM 打包）——
-            三张 1024² 贴图即可承载整套道具资产，符合游戏项目的显存与采样预算。
-          </p>
-        </div>
-      </div>
+    <div class="tech-panel solo" data-rv>
+      <h4>制作流程拆解</h4>
+      <div class="sub">Production Pipeline · 4 Stages</div>
+      <ol class="flow">
+        <li>
+          <b><em>01</em>Blender 高低模制作</b>
+          <p>同步搭建高模与低模：高模承载倒角、雕花与螺丝等完整细节形态，
+             低模按游戏道具标准精简布线，保留轮廓转折与硬边。
+             全模型按材质类型划分为 <code>11 个 Texture Set</code>，
+             统一低模 UV，确保各分区在单张贴图集内排布合理且互不重叠。</p>
+        </li>
+        <li>
+          <b><em>02</em>Substance 3D Painter 烘焙与绘制</b>
+          <p>以高模为源对低模做几何烘焙，得到法线、AO 与曲率等贴图；
+             在此基础上按 11 个材质分区分别绘制做旧钢件、黄铜、木材等质感，
+             最终导出固有色、法线与 MRA 三张贴图。</p>
+        </li>
+        <li>
+          <b><em>03</em>低模拓扑整理与 FBX 导出</b>
+          <p>烘焙后复核低模布线，修正扭曲、黑边与平滑组问题，
+             确认硬边正确后导出 FBX —— 保证跨软件传递时法线与 UV 不失真。</p>
+        </li>
+        <li>
+          <b><em>04</em>3ds Max 材质灯光重建与渲染</b>
+          <p>低模经 FBX 导入 3ds Max，按 PBR 规范重建材质球并正确接入
+             D / N / MRA 贴图（含色彩空间与法线空间设置），
+             搭建灯光与渲染环境，输出高低模多视角对比与成品展示。</p>
+        </li>
+      </ol>
     </div>
 
   </div>
 </section>
 
-<!-- ============ P2 履带车 ============ -->
-<section class="sec" id="p2">
+<!-- ============ P3 履带车 ============ -->
+<section class="sec" id="p3">
   <div class="sec-inner">
 
     <div class="sec-head" data-rv>
-      <div class="sec-idx">Project 02 — Hard Surface · UDIM</div>
+      <div class="sec-idx">Project 03 — Hard Surface · UDIM</div>
       <h2 class="sec-title">
         S1 履带式防空车<br>
         <span class="thin">复杂机械体建模 &amp; UDIM 多分块管理</span>
@@ -1260,13 +1330,13 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   </div>
 </section>
 
-<!-- ============ P3 电商 ============ -->
-<section class="sec" id="p3" style="background:linear-gradient(180deg, var(--bg) 0%, var(--bg-1) 50%, var(--bg) 100%);">
+<!-- ============ P4 电商 ============ -->
+<section class="sec" id="p4" style="background:linear-gradient(180deg, var(--bg) 0%, var(--bg-1) 50%, var(--bg) 100%);">
   <div class="sec-inner">
 
     <div class="sec-head top">
       <div data-rv>
-        <div class="sec-idx">Project 03 — Commercial Visual</div>
+        <div class="sec-idx">Project 04 — Commercial Visual</div>
         <h2 class="sec-title">
           电商产品视觉<br>
           <span class="thin">场景搭建 · 灯光渲染 · 商业转化</span>
