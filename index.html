@@ -322,6 +322,8 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 }
 .zoom-btn svg{ width:16px; height:16px; }
 .hero-shot:hover .zoom-btn{ background:var(--acc); border-color:var(--acc); color:#08090b; transform:scale(1.08); }
+/* 场景道具：1:1 渲染图居中收窄，避免整幅铺满后纵向过高 */
+.hero-shot.sq{ max-width:min(100%,820px); margin-left:auto; margin-right:auto; }
 
 /* 多视图网格 */
 .mv-grid{
@@ -834,7 +836,8 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
     <a href="#p1" data-nav>格洛克 / Glock</a>
     <a href="#p2" data-nav>蒸汽手枪 / Prop</a>
     <a href="#p3" data-nav>履带车 / Vehicle</a>
-    <a href="#p4" data-nav>电商 / Shop</a>
+    <a href="#p4" data-nav>场景 / Scene</a>
+    <a href="#p5" data-nav>电商 / Shop</a>
     <a href="#skills" data-nav>技能栈 / Skills</a>
     <a href="#exp" data-nav>经历 / Experience</a>
   </div>
@@ -1311,13 +1314,110 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   </div>
 </section>
 
-<!-- ============ P4 电商 ============ -->
-<section class="sec" id="p4" style="background:linear-gradient(180deg, var(--bg) 0%, var(--bg-1) 50%, var(--bg) 100%);">
+<!-- ============ P4 场景道具 电线杆 ============ -->
+<section class="sec" id="p4">
+  <div class="sec-inner">
+
+    <div class="sec-head" data-rv>
+      <div class="sec-idx">Project 04 — Scene Prop · UE5</div>
+      <h2 class="sec-title">
+        城市输电杆场景道具<br>
+        <span class="thin">硬表面建模 &amp; UE5 引擎落地</span>
+      </h2>
+      <p class="sec-desc">
+        以城市输电杆为原型的场景道具。围绕底座法兰、加强肋、地脚螺栓与杆身焊缝展开硬表面建模，
+        重点处理厚板倒角、铸件分模线与焊接飞边的层次；UV 展开后统一到单套 2048² 贴图，
+        绘制漆面老化、雨水冲刷与螺栓锈蚀，输出 Base Color / Normal / ORM 三通道；
+        最终接入 UE5 验证材质节点、比例关系与实时管线下的观感一致性。
+      </p>
+    </div>
+
+    <div class="spec-bar" data-rv>
+      <dl class="spec"><dt>资产类型</dt><dd>场景道具<small>Scene Prop · 单体资产</small></dd></dl>
+      <dl class="spec"><dt>贴图规格</dt><dd>2048²<small>单套 UV · 3 张</small></dd></dl>
+      <dl class="spec"><dt>通道输出</dt><dd>Base / Normal / ORM<small>R 遮蔽 · G 粗糙 · B 金属</small></dd></dl>
+      <dl class="spec"><dt>引擎落地</dt><dd>UE5<small>材质节点接入</small></dd></dl>
+      <dl class="spec"><dt>渲染验证</dt><dd>Cycles / UE5<small>离线成图 · 实时管线对拍</small></dd></dl>
+    </div>
+
+    <!-- 主视觉 -->
+    <figure class="hero-shot sq" data-rv data-lb="assets/sc_hero.jpg" data-cap="底座特写 · 成品渲染 — 法兰、加强肋、地脚螺栓与混凝土基座的材质层次">
+      <img src="assets/sc_hero.jpg" alt="城市输电杆底座成品渲染图" loading="lazy">
+      <figcaption class="hero-shot-cap">
+        <div>
+          <h3>底座特写 · 成品渲染</h3>
+          <p>Base Detail · Cycles Render</p>
+        </div>
+        <span class="zoom-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+        </span>
+      </figcaption>
+    </figure>
+
+    <!-- 线框与 UV -->
+    <div class="chan-block" style="margin-top:clamp(30px,4vw,50px)">
+      <div class="chan-head" data-rv>
+        <h4>UV 展开与布线</h4>
+        <span>Single 2048² UV Set</span>
+      </div>
+      <figure class="wf wide" data-rv data-lb="assets/sc_uvwire.jpg" data-cap="左：UV 展开排布 —— 杆身环形分段、底座圆盘与法兰环独立成岛，接缝落在结构转折与隐藏边；右：布线检查">
+        <img src="assets/sc_uvwire.jpg" alt="输电杆 UV 展开与线框布线" loading="lazy">
+        <figcaption><i>UV Layout &amp; Wireframe</i><b>UV 展开与布线检查</b></figcaption>
+      </figure>
+      <p class="chan-note">
+        杆身按环形分段展开，让涂装纹理可以沿轴向自然平铺；底座圆盘、法兰环与地脚螺栓各自独立成岛，
+        接缝统一收在结构转折与隐藏边，避免在受光面上暴露；全部部件共用一套 2048² 贴图。
+      </p>
+    </div>
+
+    <!-- 贴图集 -->
+    <div class="chan-block">
+      <div class="chan-head" data-rv>
+        <h4>贴图集 · 三张 2048²</h4>
+        <span>Base Color · Normal · ORM</span>
+      </div>
+      <div class="chan-grid">
+        <figure class="chan" data-lb="assets/sc_tex_D.jpg" data-cap="Base Color — 漆面老化、雨水冲刷的竖向污渍与螺栓锈蚀">
+          <img src="assets/sc_tex_D.jpg" alt="Base Color 贴图" loading="lazy"><b>Base Color</b></figure>
+        <figure class="chan" data-lb="assets/sc_tex_N.jpg" data-cap="Normal — 焊缝、螺栓六角头、厚板倒角与铸件麻面">
+          <img src="assets/sc_tex_N.jpg" alt="Normal 贴图" loading="lazy"><b>Normal</b></figure>
+        <figure class="chan" data-lb="assets/sc_tex_ORM.jpg" data-cap="ORM 打包 — R 环境光遮蔽 / G 粗糙度 / B 金属度">
+          <img src="assets/sc_tex_ORM.jpg" alt="ORM 贴图" loading="lazy"><b>ORM Packed</b></figure>
+      </div>
+      <p class="chan-note">
+        三张 2048² 覆盖杆身涂装、金属结构与混凝土基座：<code>Base Color</code> 记录漆面老化与雨水冲刷痕迹，
+        <code>Normal</code> 承载焊缝、螺栓与倒角，<code>ORM</code> 把遮蔽、粗糙度与金属度打包进 R / G / B ——
+        混凝土与涂装钢的粗糙度差异按材质区域分区绘制，符合 UE / Unity 的采样与显存预算。
+      </p>
+    </div>
+
+    <!-- UE5 实机验证 -->
+    <div class="chan-block" style="margin-top:clamp(30px,4vw,50px)">
+      <div class="chan-head" data-rv>
+        <h4>UE5 实机验证</h4>
+        <span>Real-time · Unreal Engine 5</span>
+      </div>
+      <figure class="wf wide" data-rv data-lb="assets/sc_ue5.jpg" data-cap="UE5 引擎内实机截图 —— 同一套贴图在实时管线下的材质接入与比例表现">
+        <img src="assets/sc_ue5.jpg" alt="输电杆场景道具在 UE5 中的实机渲染效果" loading="lazy">
+        <figcaption><i>In-Engine Capture</i><b>UE5 实机效果</b></figcaption>
+      </figure>
+      <p class="chan-note">
+        同一套 2048² 贴图直接接入 UE5 材质：Base Color 走 sRGB，Normal 与 ORM 走线性，
+        ORM 按 R 遮蔽 / G 粗糙 / B 金属分别接节点 —— 实时管线下的锈迹分布、漆面粗糙度与混凝土颗粒
+        与离线渲染保持一致，可直接用于引擎内的场景摆放与后续关卡整合。
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ P5 电商 ============ -->
+<section class="sec" id="p5" style="background:linear-gradient(180deg, var(--bg) 0%, var(--bg-1) 50%, var(--bg) 100%);">
   <div class="sec-inner">
 
     <div class="sec-head top">
       <div data-rv>
-        <div class="sec-idx">Project 04 — Commercial Visual</div>
+        <div class="sec-idx">Project 05 — Commercial Visual</div>
         <h2 class="sec-title">
           电商产品视觉<br>
           <span class="thin">场景搭建 · 灯光渲染 · 商业转化</span>
